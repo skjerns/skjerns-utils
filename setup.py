@@ -8,9 +8,5 @@ setup(name='skjerns-utils',
       author_email='nomail',
       license='GNU 2.0',
       packages=['stimer', 'sdill', 'ospath'],
-      install_requires=[
-         'tqdm',
-         'dill',
-         'joblib',
-          'mne'],
+      install_requires=['dill'],
       zip_safe=False)
