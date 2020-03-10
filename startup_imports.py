@@ -30,22 +30,32 @@ try:
     plt = Importplt()
     dill = pickle
     from pysnooper import snoop
+    import stimer
+    from stimer import start, stop
 except Exception as e:
     print(e)    
+
+# check if run in console or in script
+def is_in_script():
+    print(get_ipython().__class__.__name__)
+    try:
+        return get_ipython().__class__.__name__=='EZMQInteractiveShell'
+    except:
+        return True
 
 # this makes debugging unittests line by line much easier
 class _DummyTestClass(unittest.TestCase):
     def __getattribute__(self, item):
         if not (item  in ['__class__', 'runTest','addTypeEqualityFunc', '_type_equality_funcs' ]) \
         and not (item in unittest.TestCase.__dict__):
-            if '__file__' in globals():
+            if is_in_script():
                 print('this function should not be called within a script, only from command line\n' +
                                   'make sure all calls to cls/self are assigned. Tried read  {}'.format(item))
         return object.__getattribute__(self, item)
     def __setattr__(self, item, value):
         if not (item  in ['__class__', 'runTest','addTypeEqualityFunc', '_type_equality_funcs' ]) \
         and not (item in unittest.TestCase.__dict__) and not (item.startswith('_')):
-            if '__file__' in globals():
+            if is_in_script():
                 print('this function should not be called within a script, only from command line\n' +
                                   'make sure all calls to cls/self are assigned. Tried set  {}'.format(item))
         return object.__setattr__(self, item, value)

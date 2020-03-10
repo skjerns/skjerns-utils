@@ -109,7 +109,7 @@ def list_folders(path, subfolders=False, add_parent=False):
         
     return folders
 
-def list_files(path, patterns=None, exts=None, relative=False, 
+def list_files(path, exts=None, patterns=None, relative=False, 
                subfolders=False, return_strings=True, only_folders=False):
     """
     will make a list of all files with extention exts (list)
