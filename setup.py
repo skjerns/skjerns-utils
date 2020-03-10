@@ -21,3 +21,6 @@ try:
     print('Copied startup-script to', ipython_path)
 except:
     print('Could not copy to', ipython_path, '\ncopy manually')
+
+
+os.system('pause')

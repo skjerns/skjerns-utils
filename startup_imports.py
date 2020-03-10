@@ -6,6 +6,7 @@ try:
     from importlib import reload
     import unittest
     import inspect
+    import shutil
 except Exception as e:
     print(e)
 
