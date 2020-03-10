@@ -37,7 +37,6 @@ except Exception as e:
 
 # check if run in console or in script
 def is_in_script():
-    print(get_ipython().__class__.__name__)
     try:
         return get_ipython().__class__.__name__=='EZMQInteractiveShell'
     except:
