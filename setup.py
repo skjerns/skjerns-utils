@@ -1,4 +1,6 @@
 from setuptools import setup
+import os
+import shutil
 
 setup(name='skjerns-utils',
       version='1.07',
@@ -14,3 +16,12 @@ setup(name='skjerns-utils',
          'joblib',
           'mne'],
       zip_safe=False)
+
+
+try:
+    home = os.path.expanduser('~')
+    ipython_path  = os.path.join(home, '.ipython', 'profile_default', 'startup')
+    shutil.copy('./startup_imports.py', ipython_path)
+    print('Copied startup-script to', ipython_path)
+except:
+    print('Could not copy to', ipython_path, '\ncopy manually')
