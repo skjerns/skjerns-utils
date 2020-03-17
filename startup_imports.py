@@ -7,6 +7,7 @@ try:
     import unittest
     import inspect
     import shutil
+    import tempfile
 except Exception as e:
     print(e)
 
@@ -62,3 +63,6 @@ class _DummyTestClass(unittest.TestCase):
 
 self = _DummyTestClass()
 cls = self
+try:cls.tmpdir = tempfile.mkdtemp(prefix='unisens_')
+except:pass
+
