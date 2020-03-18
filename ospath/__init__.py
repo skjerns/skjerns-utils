@@ -20,6 +20,10 @@ except Exception:
     print('[ospath] can\'t import Path from pathlib, need Python 3.5+')
 from os.path import *
 import os
+from tkinter.filedialog import askopenfilename, askdirectory
+from tkinter import simpledialog
+from tkinter import  Tk
+
 
 def join(path, *paths):
     """
@@ -164,3 +168,49 @@ def list_files(path, exts=None, patterns=None, relative=False,
         files = [join(file) for file in files]
     
     return files
+
+def choose_file(default_dir=None,exts='txt', title='Choose file'):
+    """
+    Open a file chooser dialoge with tkinter.
+    
+    :param default_dir: Where to open the dir, if set to None, will start at wdir
+    :param exts: A string or list of strings with extensions etc: 'txt' or ['txt','csv']
+    :returns: the chosen file
+    """
+    root = Tk()
+    root.iconify()
+    root.update()
+    if isinstance(exts, str): exts = [exts]
+    name = askopenfilename(initialdir=None,
+                           parent=root,
+                           title = title,
+                           filetypes =(*[("File", "*.{}".format(ext)) for ext in exts],
+                                       ("All Files","*.*")))
+    root.update()
+    root.destroy()
+    if not os.path.exists(name):
+        print("No file chosen")
+    else:
+        return name
+
+def choose_folder(default_dir=None,exts='txt', title='Choose file'):
+    """
+    Open a file chooser dialoge with tkinter.
+    
+    :param default_dir: Where to open the dir, if set to None, will start at wdir
+    :param exts: A string or list of strings with extensions etc: 'txt' or ['txt','csv']
+    :returns: the chosen file
+    """
+    root = Tk()
+    root.iconify()
+    root.update()
+    if isinstance(exts, str): exts = [exts]
+    name = askdirectory(initialdir=None,
+                           parent=root,
+                           title = title)
+    root.update()
+    root.destroy()
+    if not os.path.exists(name):
+        print("No folder chosen")
+    else:
+        return name

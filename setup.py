@@ -3,8 +3,8 @@ import os
 import shutil
 
 setup(name='skjerns-utils',
-      version='1.07',
-      description='A collection of tools to speed up my development',
+      version='1.08',
+      description='A collection of tools and boiler plate functions',
       url='http://github.com/skjerns/skjerns-utils',
       author='skjerns',
       author_email='nomail',
@@ -21,3 +21,4 @@ try:
     print('Copied startup-script to', ipython_path)
 except:
     print('Could not copy to', ipython_path, '\ncopy manually')
+import sys, os, traceback, types
