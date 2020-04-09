@@ -68,9 +68,3 @@ def _dummy_wrapper(obj):
     
 starttime = dict({'%%COUND%%':0})
 
-
-def test():
-    lapse()
-    sleep(0.1)
-    lapse()
-test()
