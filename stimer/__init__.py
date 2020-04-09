@@ -1,2 +1,2 @@
-from .stimer import start, stop, sleep, _dummy_wrapper, time, lapse
+from .stimer import start, stop, sleep, _dummy_wrapper, lapse
 
