@@ -3,7 +3,7 @@ import os
 import shutil
 
 setup(name='skjerns-utils',
-      version='1.08',
+      version='1.09',
       description='A collection of tools and boiler plate functions',
       url='http://github.com/skjerns/skjerns-utils',
       author='skjerns',

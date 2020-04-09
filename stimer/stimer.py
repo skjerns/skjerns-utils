@@ -17,7 +17,7 @@ def lapse():
         elapsed = _print_time(t.time() - starttime[identifier])
         caller = getframeinfo(stack()[1][0])
         count = starttime['%%COUND%%']
-        line = '{}:{}'.format(os.path.basename(caller.filename), caller.lineno)
+        line = '{}:{}():{}'.format(os.path.basename(caller.filename), caller.function,  caller.lineno)
         print('[{}] {} - {}'.format(count, line, elapsed))
         starttime[identifier] = t.time()
     starttime['%%COUND%%']+=1
