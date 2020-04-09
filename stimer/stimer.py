@@ -1,46 +1,61 @@
 import time as t
+from inspect import getframeinfo, stack
+import os
 
-def time(identifier = ''):
+
+
+
+
+def lapse():
     """
-    A timer with the identifier will be either started or stopped.
-    Same as toggle()
-    
-    :param identifier: 
+    Will print the time from the previous invocation
     """
-    if identifier in starttime:
-        return stop(identifier)
-    else :
-        return start(identifier)
-    
-def toggle(identifier=''):
-    return time(identifier)
+    identifier = '%%LAPSE%%'
+    if not identifier in starttime:
+        starttime[identifier] = t.time()
+    else:
+        elapsed = _print_time(t.time() - starttime[identifier])
+        caller = getframeinfo(stack()[1][0])
+        count = starttime['%%COUND%%']
+        line = '{}:{}'.format(os.path.basename(caller.filename), caller.lineno)
+        print('[{}] {} - {}'.format(count, line, elapsed))
+        starttime[identifier] = t.time()
+    starttime['%%COUND%%']+=1
 
 def start(identifier = ''):
     """
     Starts a timer with the given identifier
     """
     starttime[identifier] = t.time()
+   
+
+
+def _print_time(seconds):
+        if seconds > 7200:
+            hours   = seconds//3600
+            minutes = seconds//60 - hours*60
+            return "{:.0f}:{:02.0f} hours".format(hours, minutes)
+        elif seconds > 180:
+            minutes = seconds//60
+            seconds = seconds%60
+            return "{:.0f}:{:02.0f} min".format(minutes , seconds)
+        elif seconds > 1:
+            return "{:02.1f} sec".format(seconds)
+        elif seconds > 0.001:
+            return "{} ms".format(int(seconds*1000))
+        else:
+            return "{} ms".format(seconds*1000)
+   
     
 def stop(identifier = ''):
     """
     Stops a timer with the given identifier and prints the elapsed time
     """
     try:
-        end = t.time()-starttime[identifier]
-        if end > 7200:
-            hours   = end//3600
-            minutes = end//60 - hours*60
-            print("Elapsed{}: {:.0f}:{:02.0f} hours".format(' '+str(identifier) if len(str(identifier))>0 else '',hours,minutes))
-        elif end > 180:
-            minutes = end//60
-            seconds = end%60
-            print("Elapsed{}: {:.0f}:{:02.0f} minutes".format(' '+str(identifier) if len(str(identifier))>0 else '', minutes , seconds ))
-        else:
-            print("Elapsed{}: {:02.3f} seconds".format(' '+str(identifier) if len(str(identifier))>0 else '',end))
-        elapsed =  t.time()-starttime[identifier]
+        elapsed = t.time()-starttime[identifier]
+        print('Elapsed {}: '.format(_print_time(elapsed)))
         del starttime[identifier]
         return elapsed
-    
     except KeyError:
         print('[stimer] KeyError: Identifier {} not found'.format(identifier))
    
@@ -51,5 +66,11 @@ def _dummy_wrapper(obj):
     """a dummy wrapper that just passes through functions"""
     return obj
     
-starttime = dict()
-start('')
+starttime = dict({'%%COUND%%':0})
+
+
+def test():
+    lapse()
+    sleep(0.1)
+    lapse()
+test()
