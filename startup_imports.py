@@ -31,6 +31,7 @@ try:
     import sdill as pickle
     plt = Importplt()
     dill = pickle
+    import matplotlib.pyplot as plt
     from pysnooper import snoop
     import stimer
     from stimer import start, stop
@@ -65,4 +66,28 @@ self = _DummyTestClass()
 cls = self
 try:cls.tmpdir = tempfile.mkdtemp(prefix='unisens_')
 except:pass
+
+
+def check_extended_display():
+    from win32api import GetSystemMetrics
+    t_width, t_height = GetSystemMetrics(79), GetSystemMetrics(78)
+    c_width, c_height = GetSystemMetrics(1), GetSystemMetrics(0)
+    
+    if t_width==c_width and c_height==t_height:
+        return False
+    return True
+
+
+def _new_figure(*args, **kwargs):
+    """
+    This convenience function creates figures 
+    on the second screen automatically
+    """
+    fig = plt._figure(*args, **kwargs)
+    if check_extended_display():
+        fig.canvas.manager.window.move(2100,400)
+    return fig
+
+plt._figure = plt.figure
+plt.figure = _new_figure
 
