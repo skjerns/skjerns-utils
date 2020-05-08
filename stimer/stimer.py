@@ -18,7 +18,13 @@ def lapse():
         caller = getframeinfo(stack()[1][0])
         count = starttime['%%COUND%%']
         line = '{}:{}():{}'.format(os.path.basename(caller.filename), caller.function,  caller.lineno)
-        print('[{}] {} - {}'.format(count, line, elapsed))
+        if line in line_cache: 
+            line_cache.clear()
+            star='*'
+        else:
+            line_cache.add(line)
+            star = ''
+        print('[{}] {} - {}\t{}'.format(count, line, elapsed, star))
         starttime[identifier] = t.time()
     starttime['%%COUND%%']+=1
 
@@ -53,7 +59,7 @@ def stop(identifier = ''):
     """
     try:
         elapsed = t.time()-starttime[identifier]
-        print('Elapsed {}: '.format(_print_time(elapsed)))
+        print('Elapsed {}: {}'.format(identifier, _print_time(elapsed)))
         del starttime[identifier]
         return elapsed
     except KeyError:
@@ -67,4 +73,4 @@ def _dummy_wrapper(obj):
     return obj
     
 starttime = dict({'%%COUND%%':0})
-
+line_cache = set()
