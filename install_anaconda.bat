@@ -3,8 +3,10 @@ choco install anaconda3 --force --params '"/AddToPath /D:%UserProfile%\"'
 %UserProfile%\Anaconda3\scripts\pip.exe install pprint mss pyexcel pyexcel-ods pyexcel-ods3 mat73 pyedflib git+https://github.com/skjerns/pyRobotEyez
 
 set SHIMGEN=C:\ProgramData\chocolatey\tools\shimgen.exe
-set SCRIPTS=c:\anaconda3\scripts\
-%SHIMGEN% -p %SCRIPTS%\spyder.exe -i %SCRIPTS%\spyder.ico -o %SCRIPTS%\spyder_icon.exe
+set ANACONDA=%UserProfile%\anaconda3
+%SHIMGEN% -p %ANACONDA%\pythonw.exe -o %ANACONDA%\spyder_icon.exe -c "%ANACONDA%\cwp.py %ANACONDA% %ANACONDA%\pythonw.exe %ANACONDA%\Scripts\spyder-script.py" -i %ANACONDA%\Scripts\spyder.ico
+
+C:\Users\Simon\Anaconda3\pythonw.exe C:\Users\Simon\Anaconda3\cwp.py C:\Users\Simon\Anaconda3 C:\Users\Simon\Anaconda3\pythonw.exe C:\Users\Simon\Anaconda3\Scripts\spyder-script.py
 
 type NUL > "%UserProfile%\vis.bat"
 ECHO call activate visbrain >> "%UserProfile%\vis.bat"
