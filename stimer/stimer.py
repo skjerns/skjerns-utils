@@ -1,20 +1,46 @@
 import time as t
 from inspect import getframeinfo, stack
 import os
+import numpy as np
 
 
 
+def timeit(func, *args, repetitions=1, **kwargs):
+    """
+    time a certain function call
+    """
+    
+    mean_elapsed = []
+    for repetition in range(repetitions):
+        start('%TIMEIT%')
+        result = func(*args, **kwargs)
+        elapsed = stop('%TIMEIT%', verbose=False)
+        mean_elapsed.append(elapsed)
+    
+    elapsed = np.array(elapsed)
+    min_str = _print_time(elapsed.min())
+    max_str = _print_time(elapsed.max())
+    mean_str = _print_time(elapsed.mean())
+    
+    if repetitions==1:
+        print(f'[{func.__name__}] {mean_str}')
+    else:
+        print(f'[{func.__name__}] {repetitions} runs: {mean_str} ({min_str} - {max_str})')
+    return result
+    
 
 
-def lapse(prefix=''):
+def lapse(prefix='', verbose=True):
     """
     Will print the time from the previous invocation
     """
     identifier = '%%LAPSE%%'
     if not identifier in starttime:
         starttime[identifier] = t.perf_counter()
+        elapsed = 0
     else:
-        elapsed = _print_time(t.perf_counter() - starttime[identifier])
+        elapsed = t.perf_counter() - starttime[identifier]
+        elapsed_str = _print_time(elapsed)
         caller = getframeinfo(stack()[1][0])
         count = starttime['%%COUND%%']
         line = '{}:{}():{}'.format(os.path.basename(caller.filename), caller.function,  caller.lineno)
@@ -26,9 +52,11 @@ def lapse(prefix=''):
             line_cache.add(line)
             star = ''
         if prefix != '': prefix = f' {prefix}'
-        print(f'[{count}{prefix}] {line} - {elapsed}\t{star}')
+        if verbose:
+            print(f'[{count}{prefix}] {line} - {elapsed_str}\t{star}')
         starttime[identifier] = t.perf_counter()
     starttime['%%COUND%%']+=1
+    return elapsed
 
 def start(identifier = ''):
     """
@@ -59,13 +87,14 @@ def _print_time(seconds):
         return "{} nanoseconds".format(int(seconds*1e-9))
    
     
-def stop(identifier = ''):
+def stop(identifier = '', verbose=True):
     """
     Stops a timer with the given identifier and prints the elapsed time
     """
     try:
-        elapsed = t.perf_counter()-starttime[identifier]
-        print('Elapsed {}: {}'.format(identifier, _print_time(elapsed)))
+        elapsed = t.perf_counter() - starttime[identifier]
+        if verbose: 
+            print('Elapsed {}: {}'.format(identifier, _print_time(elapsed)))
         del starttime[identifier]
         return elapsed
     except KeyError:

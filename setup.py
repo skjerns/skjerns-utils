@@ -10,7 +10,10 @@ setup(name='skjerns-utils',
       author_email='nomail',
       license='GNU 2.0',
       packages=['stimer', 'sdill', 'ospath'],
-      install_requires=['dill'],
+      install_requires=['dill', 'dateparser', 'pyedflib', 'mat73', 'mss', 'lspopt', 'pytablewriter',
+      'pybind11', 'emlearn', 'bleak', 'scikit-learn', 'dill','coverage', 'imageio', 'keras', 'natsort',
+      'numba', 'tqdm', 'prettytable', 'pysnooper', 'mne', 'joblib', 'clipboard', 'dateparser', 
+      'opencv-python==3.4.8.29', 'pygame', 'python-pptx'],
       zip_safe=False)
 
 
