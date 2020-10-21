@@ -1,6 +1,6 @@
 choco install anaconda3 --force --params '"/AddToPath /D:%UserProfile%\"'
 %UserProfile%\Anaconda3\scripts\pip.exe install pybind11 emlearn bleak scikit-learn dill coverage imageio keras natsort numba tqdm prettytable pysnooper mne joblib clipboard dateparser opencv-python==3.4.8.29 git+https://github.com/skjerns/skjerns-utils git+https://github.com/hbldh/lspopt.git#egg=lspopt pygame 
-%UserProfile%\Anaconda3\scripts\pip.exe install pprint mss pyexcel pyexcel-ods pyexcel-ods3 mat73 pyedflib git+https://github.com/skjerns/pyRobotEyez
+%UserProfile%\Anaconda3\scripts\pip.exe install mss pyexcel pyexcel-ods pyexcel-ods3 mat73 pyedflib git+https://github.com/skjerns/pyRobotEyez
 
 set SHIMGEN=C:\ProgramData\chocolatey\tools\shimgen.exe
 set ANACONDA=%UserProfile%\anaconda3
