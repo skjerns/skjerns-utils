@@ -67,6 +67,11 @@ cls = self
 try:cls.tmpdir = tempfile.mkdtemp(prefix='unisens_')
 except:pass
 
+def profile(func):
+    import traceback
+    print(f'WARNING: @profile debugger active for {func}()')
+    print(traceback.format_stack(limit=2)[0])
+    return func
 
 def check_extended_display():
     from win32api import GetSystemMetrics

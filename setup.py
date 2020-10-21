@@ -3,7 +3,7 @@ import os
 import shutil
 
 setup(name='skjerns-utils',
-      version='1.09',
+      version='1.10',
       description='A collection of tools and boiler plate functions',
       url='http://github.com/skjerns/skjerns-utils',
       author='skjerns',
@@ -13,7 +13,7 @@ setup(name='skjerns-utils',
       install_requires=['dill', 'dateparser', 'pyedflib', 'mat73', 'mss', 'lspopt', 'pytablewriter',
       'pybind11', 'emlearn', 'bleak', 'scikit-learn', 'dill','coverage', 'imageio', 'keras', 'natsort',
       'numba', 'tqdm', 'prettytable', 'pysnooper', 'mne', 'joblib', 'clipboard', 'dateparser', 
-      'opencv-python==3.4.8.29', 'pygame', 'python-pptx'],
+      'opencv-python==3.4.8.29', 'pygame', 'python-pptx', 'dominate'],
       zip_safe=False)
 
 

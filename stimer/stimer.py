@@ -12,9 +12,9 @@ def timeit(func, *args, repetitions=1, **kwargs):
     
     mean_elapsed = []
     for repetition in range(repetitions):
-        start('%TIMEIT%')
+        start('%%TIMEIT%%')
         result = func(*args, **kwargs)
-        elapsed = stop('%TIMEIT%', verbose=False)
+        elapsed = stop('%%TIMEIT%%', verbose=False)
         mean_elapsed.append(elapsed)
     
     elapsed = np.array(elapsed)
@@ -26,7 +26,7 @@ def timeit(func, *args, repetitions=1, **kwargs):
         print(f'[{func.__name__}] {mean_str}')
     else:
         print(f'[{func.__name__}] {repetitions} runs: {mean_str} ({min_str} - {max_str})')
-    return result
+    return elapsed
     
 
 
@@ -57,6 +57,7 @@ def lapse(prefix='', verbose=True):
         starttime[identifier] = t.perf_counter()
     starttime['%%COUND%%']+=1
     return elapsed
+
 
 def start(identifier = ''):
     """
