@@ -104,9 +104,6 @@ def stop(identifier = '', verbose=True):
 def sleep(seconds):
     t.sleep(seconds)
     
-def _dummy_wrapper(obj):
-    """a dummy wrapper that just passes through functions"""
-    return obj
-    
+
 starttime = dict({'%%COUND%%':0})
 line_cache = set()
