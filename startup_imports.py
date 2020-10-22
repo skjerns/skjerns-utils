@@ -8,6 +8,7 @@ try:
     import inspect
     import shutil
     import tempfile
+    from pprint import pformat, pprint
 except Exception as e:
     print(e)
 
@@ -67,11 +68,29 @@ cls = self
 try:cls.tmpdir = tempfile.mkdtemp(prefix='unisens_')
 except:pass
 
-def profile(func):
-    import traceback
-    print(f'WARNING: @profile debugger active for {func}()')
-    print(traceback.format_stack(limit=2)[0])
-    return func
+#######
+# pass-through wrapper for line-profiler / kernprof
+try:
+    # Python 2
+    import __builtin__ as builtins
+except ImportError:
+    # Python 3
+    import builtins
+
+try: # pass t
+    builtins.profile
+except AttributeError:
+    # No line profiler, provide a pass-through version
+    def profile(func):
+        import traceback
+        print(f'WARNING: @profile debugger active for {func}()')
+        print(traceback.format_stack(limit=2)[0])
+        return func
+    builtins.profile = profile
+
+
+####################
+#### make matplotlib fullscreen on second screen automatically
 
 def check_extended_display():
     from win32api import GetSystemMetrics
@@ -99,3 +118,23 @@ def _new_figure(*args, maximize=None, **kwargs):
 plt._figure = plt.figure
 plt.figure = _new_figure
 plt.maximize=True
+
+
+# overwrite print function with pprint
+def pprint_wrapper(*args, sep=' ', end='\n', file=sys.stdout, flush=False):
+    """
+    Wrapper for pretty-print. Forwards to print.
+    Prints the values to a stream, or to sys.stdout by default.
+
+    Optional keyword arguments:
+    file:  a file-like object (stream); defaults to the current sys.stdout.
+    sep:   string inserted between values, default a space.
+    end:   string appended after the last value, default a newline.
+    flush: whether to forcibly flush the stream.
+    """
+    args = [pformat(arg) for arg in args]
+    args = [arg[1:-1] if isinstance(arg, str) else arg for arg in args]
+    __print(*args, sep=sep, end=end, file=file, flush=flush)
+__print = print
+print = pprint_wrapper
+builtins.print = pprint_wrapper
