@@ -4,30 +4,43 @@ import os
 import numpy as np
 
 
+def timeit(fn):
+    """
+    time a function call, use it as a wrapper:
+    
+    Example:
+        @stimer.timeit
+        def test():
+            time.sleep(1)
+        # 1 second
 
-def timeit(func, *args, repetitions=1, **kwargs):
+    Can be called repeatedly:
+        @stimer.timeit(15)
+        def test():
+            time.sleep(1)
+        # 15 seconds
     """
-    time a certain function call
-    """
-    
-    mean_elapsed = []
-    for repetition in range(repetitions):
-        start('%%TIMEIT%%')
-        result = func(*args, **kwargs)
-        elapsed = stop('%%TIMEIT%%', verbose=False)
-        mean_elapsed.append(elapsed)
-    
-    elapsed = np.array(elapsed)
-    min_str = _print_time(elapsed.min())
-    max_str = _print_time(elapsed.max())
-    mean_str = _print_time(elapsed.mean())
-    
-    if repetitions==1:
-        print(f'[{func.__name__}] {mean_str}')
-    else:
-        print(f'[{func.__name__}] {repetitions} runs: {mean_str} ({min_str} - {max_str})')
-    return elapsed
-    
+    def wrapper(func, iterations=1):
+        def wrapped(*args, **kwargs):
+            times = []
+            for i in range(iterations):
+                start(func.__name__)
+                result = func(*args, **kwargs)
+                elapsed = stop(func.__name__, verbose=False)
+                times.append(elapsed)
+            mean = _print_time(np.mean(times))
+            std = _print_time(np.std(times))
+            repeats = f', {iterations} loops' if iterations>1 else ''
+            print(f'{func.__name__}: {mean} +- {std}{repeats}')
+            return result
+        return wrapped
+    if callable(fn):
+        return wrapper(fn, iterations=1)
+    elif isinstance(fn, int):
+        def wrapped_repeated(func):
+            return wrapper(func, iterations=fn)
+        return wrapped_repeated
+
 
 
 def lapse(prefix='', verbose=True):
