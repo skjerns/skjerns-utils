@@ -30,8 +30,8 @@ def timeit(fn):
                 times.append(elapsed)
             mean = _print_time(np.mean(times))
             std = ' +- ' +  _print_time(np.std(times)) if iterations>1 else ''
-            repeats = f', {iterations} loops' if iterations>1 else ', one loop'
-            print(f'{func.__name__}: {mean}{std}{repeats}')
+            repeats = f', {iterations} loops' if iterations>1 else ''
+            print(f'{func.__name__}: runtime {mean}{std}{repeats}')
             return result
         return wrapped
     if callable(fn):
