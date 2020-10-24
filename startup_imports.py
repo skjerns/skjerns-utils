@@ -132,9 +132,11 @@ def pprint_wrapper(*args, sep=' ', end='\n', file=sys.stdout, flush=False):
     end:   string appended after the last value, default a newline.
     flush: whether to forcibly flush the stream.
     """
-    args = [pformat(arg) for arg in args]
-    args = [arg[1:-1] if isinstance(arg, str) else arg for arg in args]
+    if len(args)==1:
+        if not isinstance(args[0], str):
+            args = [pformat(args[0])]
     __print(*args, sep=sep, end=end, file=file, flush=flush)
 __print = print
+
 print = pprint_wrapper
 builtins.print = pprint_wrapper
