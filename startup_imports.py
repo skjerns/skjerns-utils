@@ -35,7 +35,6 @@ try:
     import matplotlib.pyplot as plt
     from pysnooper import snoop
     import stimer
-    from stimer import start, stop
 except Exception as e:
     print(e)    
 
@@ -120,23 +119,23 @@ plt.figure = _new_figure
 plt.maximize=True
 
 
-# overwrite print function with pprint
-def pprint_wrapper(*args, sep=' ', end='\n', file=sys.stdout, flush=False):
-    """
-    Wrapper for pretty-print. Forwards to print.
-    Prints the values to a stream, or to sys.stdout by default.
+# # overwrite print function with pprint
+# def pprint_wrapper(*args, sep=' ', end='\n', file=sys.stdout, flush=False):
+#     """
+#     Wrapper for pretty-print. Forwards to print.
+#     Prints the values to a stream, or to sys.stdout by default.
 
-    Optional keyword arguments:
-    file:  a file-like object (stream); defaults to the current sys.stdout.
-    sep:   string inserted between values, default a space.
-    end:   string appended after the last value, default a newline.
-    flush: whether to forcibly flush the stream.
-    """
-    if len(args)==1:
-        if not isinstance(args[0], str):
-            args = [pformat(args[0])]
-    __print(*args, sep=sep, end=end, file=file, flush=flush)
-__print = print
+#     Optional keyword arguments:
+#     file:  a file-like object (stream); defaults to the current sys.stdout.
+#     sep:   string inserted between values, default a space.
+#     end:   string appended after the last value, default a newline.
+#     flush: whether to forcibly flush the stream.
+#     """
+#     if len(args)==1:
+#         if not isinstance(args[0], str):
+#             args = [pformat(args[0])]
+#     __print(*args, sep=sep, end=end, file=file, flush=flush)
+# __print = print
 
-print = pprint_wrapper
-builtins.print = pprint_wrapper
+# print = pprint_wrapper
+# builtins.print = pprint_wrapper
