@@ -214,3 +214,10 @@ def choose_folder(default_dir=None,exts='txt', title='Choose file'):
         print("No folder chosen")
     else:
         return name
+
+
+def valid_filename(string, replacement='_'):
+    """
+    replace all non-valid filename characters with an underscore
+    """
+    return ''.join([replacement if x in _invalid_chars else x for x in string])
