@@ -4,6 +4,7 @@ import os
 import numpy as np
 
 
+
 def timeit(fn):
     """
     time a function call, use it as a wrapper:
@@ -40,7 +41,6 @@ def timeit(fn):
         def wrapped_repeated(func):
             return wrapper(func, iterations=fn)
         return wrapped_repeated
-
 
 
 def lapse(prefix='', verbose=True):
@@ -120,3 +120,4 @@ def sleep(seconds):
 
 starttime = dict({'%%COUND%%':0})
 line_cache = set()
+wrapper = timeit

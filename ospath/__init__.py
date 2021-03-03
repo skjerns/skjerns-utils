@@ -24,6 +24,7 @@ from tkinter.filedialog import askopenfilename, askdirectory
 from tkinter import simpledialog
 from tkinter import  Tk
 
+_invalid_chars = "<>:\"/\\|?*"
 
 def join(path, *paths):
     """
@@ -220,4 +221,5 @@ def valid_filename(string, replacement='_'):
     """
     replace all non-valid filename characters with an underscore
     """
+    string = str(string)
     return ''.join([replacement if x in _invalid_chars else x for x in string])
