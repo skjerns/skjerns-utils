@@ -1,9 +1,7 @@
 from setuptools import setup
 import os
 import shutil
-from tkinter import Tk
-from tkinter import *
-from tkinter import messagebox as mb
+
 
 setup(name='skjerns-utils',
       version='1.10',
@@ -19,17 +17,21 @@ setup(name='skjerns-utils',
       'opencv-python==3.4.8.29', 'pygame', 'python-pptx', 'dominate', 'pyglet'],
       zip_safe=False)
 
-
-try:
-    root = Tk()
-    res = mb.askquestion('Copy startup script?', 'Do you want to copy the startup-imports.py to the ipython startup folder? This may have side-effects.\n\nIf you dont know what this does, click "No".')
-    root.destroy()
-    
-    if res == 'yes':
-        home = os.path.expanduser('~')
-        ipython_path  = os.path.join(home, '.ipython', 'profile_default', 'startup')
-        shutil.copy('./startup_imports.py', ipython_path)
-        print('Copied startup-script to', ipython_path)
-except:
-    print('Could not copy to', ipython_path, '\ncopy manually')
 import sys, os, traceback, types
+
+if __name__=='__main__':
+    try:
+        from tkinter import Tk
+        from tkinter import *
+        from tkinter import messagebox as mb
+        root = Tk()
+        res = mb.askquestion('Copy startup script?', 'Do you want to copy the startup-imports.py to the ipython startup folder? This may have side-effects.\n\nIf you dont know what this does, click "No".')
+        root.destroy()
+        
+        if res == 'yes':
+            home = os.path.expanduser('~')
+            ipython_path  = os.path.join(home, '.ipython', 'profile_default', 'startup')
+            shutil.copy('./startup_imports.py', ipython_path)
+            print('Copied startup-script to', ipython_path)
+    except:
+        print('Could not copy to', ipython_path, '\ncopy manually')
