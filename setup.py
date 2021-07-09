@@ -13,7 +13,7 @@ setup(name='skjerns-utils',
       packages=['stimer', 'sdill', 'ospath'],
       install_requires=['dill', 'dateparser', 'pyedflib', 'mat73', 'mss', 'lspopt', 'pytablewriter',
       'pybind11', 'bleak', 'scikit-learn', 'dill','coverage', 'imageio', 'keras', 'natsort', 'pyexcel', 'pyexcel-ods', 'pyexcel-ods3', 'mlxtend',
-      'numba', 'tqdm', 'prettytable', 'pysnooper', 'mne', 'joblib', 'clipboard', 'dateparser', 
+      'numba', 'tqdm', 'prettytable', 'pysnooper', 'mne', 'joblib', 'clipboard', 'dateparser', 'umap-learn',
       'opencv-python==3.4.8.29', 'pygame', 'python-pptx', 'dominate', 'pyglet', 'python-picard'],
       zip_safe=False)
 
