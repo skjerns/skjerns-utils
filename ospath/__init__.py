@@ -21,6 +21,7 @@ except Exception:
     print('[ospath] can\'t import Path from pathlib, need Python 3.5+')
 from os.path import *
 import os
+import re
 import fnmatch
 from natsort import natsort_key
 
@@ -114,7 +115,7 @@ def list_folders(path, subfolders=False, add_parent=False, pattern='*'):
     
     for foldername in next(os.walk(path))[1]:
         folder = join(path, foldername, '/')
-        if fnmatch.fnmatch(foldername, pattern):
+        if fnmatch.fnmatch(foldername.lower(), pattern.lower()):
             folders.append(folder)
         if subfolders:
             folders.extend(list_folders(folder, subfolders=True,
@@ -157,7 +158,7 @@ def list_files(path, exts=None, patterns=None, relative=False,
     for ext in exts:
         ext = ext.replace('*', '')
         pattern = '*' + ext
-        patterns.append(pattern)
+        patterns.append(pattern.lower())
     
     # if recursiveness is asked, prepend the double asterix to each pattern
     if subfolders: patterns = ['**/' + pattern for pattern in patterns]   
@@ -165,6 +166,7 @@ def list_files(path, exts=None, patterns=None, relative=False,
     # collect files for each pattern
     files = []
     for pattern in patterns:
+        # pattern = 
         for filename in Path(path).glob(pattern):
             if filename.is_file() and filename not in files: 
                 files.append(filename)
