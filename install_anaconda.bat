@@ -6,6 +6,7 @@ set SHIMGEN=C:\ProgramData\chocolatey\tools\shimgen.exe
 set ANACONDA=%UserProfile%\anaconda3
 %SHIMGEN% -p %ANACONDA%\pythonw.exe -o %ANACONDA%\spyder_icon.exe -c "%ANACONDA%\cwp.py %ANACONDA% %ANACONDA%\pythonw.exe %ANACONDA%\Scripts\spyder-script.py" -i %ANACONDA%\Scripts\spyder.ico
 
+
 type NUL > "%UserProfile%\vis.bat"
 ECHO call activate visbrain >> "%UserProfile%\vis.bat"
 ECHO call activate visbrain >> "%UserProfile%\vis.bat"

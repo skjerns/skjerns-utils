@@ -20,6 +20,7 @@ except Exception:
     print('[ospath] can\'t import Path from pathlib, need Python 3.5+')
 from os.path import *
 import os
+import fnmatch
 from tkinter.filedialog import askopenfilename, askdirectory
 from tkinter import simpledialog
 from tkinter import  Tk
@@ -91,7 +92,7 @@ def commonpath(paths):
     return join(paths)
 
 
-def list_folders(path, subfolders=False, add_parent=False):
+def list_folders(path, subfolders=False, add_parent=False, pattern='*'):
     """
     This function will list all folders or subfolders of a certain directory
     
@@ -105,12 +106,13 @@ def list_folders(path, subfolders=False, add_parent=False):
     folders = []
     if add_parent: folders = [path]
     
-    for folder in next(os.walk(path))[1]:
-        folder = join(path, folder, '/')
-        folders.append(folder)
+    for foldername in next(os.walk(path))[1]:
+        folder = join(path, foldername, '/')
+        if fnmatch.fnmatch(foldername, pattern):
+            folders.append(folder)
         if subfolders:
             folders.extend(list_folders(folder, subfolders=True,
-                                        add_parent=False))
+                                        add_parent=False, pattern=pattern))
         
     return folders
 

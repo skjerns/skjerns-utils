@@ -5,7 +5,7 @@ Created on Fri Feb 23 11:52:26 2018
 @author: Simon Kern
 """
 
-
+import os
 import ospath
 import unittest
 
@@ -103,20 +103,32 @@ class OsPathTest(unittest.TestCase):
             
     def test_list_folders(self):
         path = ospath.abspath('.')
-        folder1 = ospath.join(path, 'folder1')+'/'
-        sub1 = ospath.join(path, 'folder1', 'subfolder')+'/'
-        
-        folders = ospath.list_folders(path, subfolders = False, add_parent = False)
-        self.assertEqual(folders, [folder1])
-        
-        folders = ospath.list_folders(path, subfolders = False, add_parent = True)
-        self.assertEqual(folders, [path, folder1])
-        
-        folders = ospath.list_folders(path, subfolders = True, add_parent = False)
-        self.assertEqual(folders, [folder1, sub1])
+        os.makedirs(path + '/subfolder/sub1', exist_ok=True)
+        os.makedirs(path + '/subfolder/sub2', exist_ok=True)
+        os.makedirs(path + '/subfolder/sub3', exist_ok=True)
+        os.makedirs(path + '/subfolder/sub3/sub4', exist_ok=True)
 
-        folders = ospath.list_folders(path, subfolders = True, add_parent = True)
-        self.assertEqual(folders, [path, folder1, sub1])
+        os.makedirs(path + '/subfolder/notincluded/sub5', exist_ok=True)
+        os.makedirs(path + '/subfolder/notincluded/notincluded', exist_ok=True)
+
+        folders = ospath.list_folders(path, subfolders = False, add_parent = False,
+                                      pattern='sub*')
+        self.assertIn('subfolder', folders[0])
+        self.assertEqual(len(folders), 1)
+        
+        folders = ospath.list_folders(path, subfolders = True, add_parent = False,
+                                      pattern='sub*')
+        self.assertEqual(len(folders), 7)
+        for f in folders:
+            self.assertIn('sub', ospath.split(f)[-1])
+                
+        folders = ospath.list_folders(path, subfolders = True, add_parent = True,
+                                      pattern='sub*')
+        self.assertEqual(len(folders), 8)
+        for f in folders[1:]:
+            self.assertIn('sub', ospath.split(f)[-1])
+                
+        
 
 if __name__ == '__main__':
     unittest.main()
