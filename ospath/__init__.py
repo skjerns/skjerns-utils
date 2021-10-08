@@ -14,6 +14,7 @@ This file contains wrappers for calls to os.path.
 
 @author: Simon Kern (@skjerns)
 """
+
 try:
     from pathlib import Path
 except Exception:
@@ -21,11 +22,16 @@ except Exception:
 from os.path import *
 import os
 import fnmatch
+from natsort import natsort_key
+
 from tkinter.filedialog import askopenfilename, askdirectory
 from tkinter import simpledialog
 from tkinter import  Tk
 
+
 _invalid_chars = "<>:\"/\\|?*"
+
+
 
 def join(path, *paths):
     """
@@ -114,7 +120,7 @@ def list_folders(path, subfolders=False, add_parent=False, pattern='*'):
             folders.extend(list_folders(folder, subfolders=True,
                                         add_parent=False, pattern=pattern))
         
-    return folders
+    return sorted(folders, key=natsort_key)
 
 def list_files(path, exts=None, patterns=None, relative=False, 
                subfolders=False, return_strings=True, only_folders=False):
@@ -170,7 +176,7 @@ def list_files(path, exts=None, patterns=None, relative=False,
     if return_strings: 
         files = [join(file) for file in files]
     
-    return files
+    return sorted(files, key=natsort_key)
 
 def choose_file(default_dir=None,exts='txt', title='Choose file'):
     """
