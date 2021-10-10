@@ -19,11 +19,13 @@ try:
     from pathlib import Path
 except Exception:
     print('[ospath] can\'t import Path from pathlib, need Python 3.5+')
+from os import makedirs
 from os.path import *
 import os
 import re
 import fnmatch
 from natsort import natsort_key
+
 
 from tkinter.filedialog import askopenfilename, askdirectory
 from tkinter import simpledialog
