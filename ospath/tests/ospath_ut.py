@@ -88,6 +88,10 @@ class OsPathTest(unittest.TestCase):
         files = ospath.list_files(path, patterns=['**/*txt'], subfolders=False)
         self.assertEqual(len(files), 2)    
         
+        for i in range(1, 15):
+            files = ospath.list_files(path, subfolders=True, max_results=i)
+            self.assertEqual(len(files), i)
+        
         files = ospath.list_files(path, subfolders=True)
         self.assertEqual(len(files),15)
         for file in files:

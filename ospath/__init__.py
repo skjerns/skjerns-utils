@@ -126,7 +126,8 @@ def list_folders(path, subfolders=False, add_parent=False, pattern='*'):
     return sorted(folders, key=natsort_key)
 
 def list_files(path, exts=None, patterns=None, relative=False, 
-               subfolders=False, return_strings=True, only_folders=False):
+               subfolders=False, return_strings=True, only_folders=False,
+               max_results=None):
     """
     will make a list of all files with extention exts (list)
     found in the path and possibly all subfolders and return
@@ -167,11 +168,15 @@ def list_files(path, exts=None, patterns=None, relative=False,
     
     # collect files for each pattern
     files = []
+    fcount = 0
     for pattern in patterns:
         # pattern = 
         for filename in Path(path).glob(pattern):
             if filename.is_file() and filename not in files: 
                 files.append(filename)
+                fcount += 1
+                if max_results is not None and max_results<=fcount:
+                    break
     
     # turn path into relative or absolute paths
     files = [file.relative_to(path) if relative else file.absolute() for file in files]
