@@ -32,7 +32,7 @@ from tkinter import simpledialog
 from tkinter import  Tk
 
 
-_invalid_chars = "<>:\"/\\|?*"
+_invalid_chars = "<>:\"/\\|?*\n\r\t"
 
 
 
