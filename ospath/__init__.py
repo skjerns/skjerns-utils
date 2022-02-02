@@ -32,7 +32,6 @@ from tkinter import simpledialog
 from tkinter import  Tk
 
 
-_invalid_chars = "<>:\"/\\|?*\n\r\t"
 
 
 
@@ -238,5 +237,12 @@ def valid_filename(string, replacement='_'):
     """
     replace all non-valid filename characters with an underscore
     """
+    invalid_chars = "<>:\"/\\|?*\n\r\t"
+    conversion = {c:c for c in _invalid_chars}
+    conversion['"'] = "'" # replace by valid quotes
+    conversion['<'] = '(' # replace by other brakets
+    conversion['>'] = ')' # replace by other brakets
+    
     string = str(string)
-    return ''.join([replacement if x in _invalid_chars else x for x in string])
+    valid_filename = ''.join([conversion.get(c, c) for c in string])
+    return valid_filename
