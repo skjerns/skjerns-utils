@@ -238,7 +238,7 @@ def valid_filename(string, replacement='_'):
     replace all non-valid filename characters with an underscore
     """
     invalid_chars = "<>:\"/\\|?*\n\r\t"
-    conversion = {c:c for c in invalid_chars}
+    conversion = {c:replacement for c in invalid_chars}
     conversion['"'] = "'" # replace by valid quotes
     conversion['<'] = '(' # replace by other brakets
     conversion['>'] = ')' # replace by other brakets
