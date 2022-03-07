@@ -106,7 +106,8 @@ def _new_figure(*args, maximize=None, second_monitor=None, **kwargs):
     This convenience function creates figures 
     on the second screen automatically and maximizes
     """        
-    maximize = maximize if maximize is not None else plt.maximize
+    if maximize is None and not 'figsize' in kwargs:
+        maximize = plt.maximize
     second_monitor = second_monitor if second_monitor is not None else plt.second_monitor
     fig = plt._figure(*args, **kwargs)
     if second_monitor and check_extended_display():
