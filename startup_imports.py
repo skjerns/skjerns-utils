@@ -106,10 +106,16 @@ def _new_figure(*args, maximize=None, second_monitor=None, **kwargs):
     This convenience function creates figures 
     on the second screen automatically and maximizes
     """        
+    fig = plt._figure(*args, **kwargs)
+    
+    # check if we are actually running a window or are in an inline-plot
+    is_windowed = hasattr(fig.canvas.manager, 'window')
+    if not is_windowed: return fig
+    
     if maximize is None and not 'figsize' in kwargs:
         maximize = plt.maximize
     second_monitor = second_monitor if second_monitor is not None else plt.second_monitor
-    fig = plt._figure(*args, **kwargs)
+    
     if second_monitor and check_extended_display():
         fig.canvas.manager.window.move(2100,400)
     if maximize:
