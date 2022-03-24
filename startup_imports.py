@@ -2,41 +2,41 @@
 try:
     import os
     import sys
-    import numpy as np
-    from importlib import reload
     import unittest
     import inspect
     import shutil
     import tempfile
     from pprint import pformat, pprint
 except Exception as e:
-    print(e)
+    print(f'Error in startup script: {e}')    
 
-# lazy import of matplotlib
-class Importplt(object):
-    def __setattr__(self, name, value):
-        global plt
-        import matplotlib.pyplot as plt
-        import sys
-        setattr(sys, name, value)
-    def __getattribute__(self, name):
-        global plt
-        import sys
-        import matplotlib.pyplot as plt
-        return getattr(sys, name)
+# # lazy import of matplotlib
+# class Importplt(object):
+#     def __setattr__(self, name, value):
+#         global plt
+#         import matplotlib.pyplot as plt
+#         import sys
+#         setattr(sys, name, value)
+#     def __getattribute__(self, name):
+#         global plt
+#         import sys
+#         import matplotlib.pyplot as plt
+#         return getattr(sys, name)
 
     
 # these libraries are maybe not present
 try:
-    from tqdm import tqdm
-    import sdill as pickle
-    plt = Importplt()
-    dill = pickle
-    import matplotlib.pyplot as plt
-    from pysnooper import snoop
-    import stimer
+    import demandimport
+    with demandimport.enabled():
+        import numpy as np
+        from tqdm import tqdm
+        import seaborn as sns
+        import sdill as pickle
+        dill = pickle
+        import matplotlib.pyplot as plt
+        import stimer
 except Exception as e:
-    print(e)    
+    print(f'Error in startup script: {e}')    
 
 # check if run in console or in script
 def is_in_script():
@@ -64,8 +64,6 @@ class _DummyTestClass(unittest.TestCase):
 
 self = _DummyTestClass()
 cls = self
-try:cls.tmpdir = tempfile.mkdtemp(prefix='unisens_')
-except:pass
 
 #######
 # pass-through wrapper for line-profiler / kernprof

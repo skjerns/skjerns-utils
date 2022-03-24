@@ -4,14 +4,14 @@ import shutil
 
 
 setup(name='skjerns-utils',
-      version='1.11',
+      version='1.12',
       description='A collection of tools and boiler plate functions',
       url='http://github.com/skjerns/skjerns-utils',
       author='skjerns',
       author_email='nomail',
       license='GNU 2.0',
       packages=['stimer', 'sdill', 'ospath'],
-      install_requires=['dill', 'dateparser', 'pyedflib', 'mat73', 'mss', 'lspopt', 'pytablewriter',
+      install_requires=['demandimport', 'dill', 'dateparser', 'pyedflib', 'mat73', 'mss', 'lspopt', 'pytablewriter',
       'pybind11', 'bleak', 'scikit-learn', 'dill','coverage', 'imageio', 'keras', 'natsort', 'pyexcel', 'pyexcel-ods', 'pyexcel-ods3', 'mlxtend',
       'numba', 'tqdm', 'prettytable', 'pysnooper', 'mne', 'joblib', 'clipboard', 'dateparser', 'umap-learn',
       'opencv-python==3.4.8.29', 'pygame', 'python-pptx', 'dominate', 'pyglet', 'python-picard'],
