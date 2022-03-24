@@ -29,7 +29,7 @@ try:
     import demandimport
     with demandimport.enabled():
         import numpy as np
-        from tqdm import tqdm
+        import tqdm.tqdm as tqdm
         import seaborn as sns
         import sdill as pickle
         dill = pickle
