@@ -6,37 +6,35 @@ try:
     import inspect
     import shutil
     import tempfile
+    import numpy as np
     from pprint import pformat, pprint
 except Exception as e:
     print(f'Error in startup script: {e}')    
 
-# # lazy import of matplotlib
-# class Importplt(object):
-#     def __setattr__(self, name, value):
-#         global plt
-#         import matplotlib.pyplot as plt
-#         import sys
-#         setattr(sys, name, value)
-#     def __getattribute__(self, name):
-#         global plt
-#         import sys
-#         import matplotlib.pyplot as plt
-#         return getattr(sys, name)
-
     
 # these libraries are maybe not present
+__import_statements = """
+from tqdm import tqdm
+import sdill as pickle
+import matplotlib.pyplot as plt
+import seaborn as sns
+import stimer
+dill = pickle
+""".strip().split('\n')
+
 try:
     import demandimport
-    with demandimport.enabled():
-        import numpy as np
-        import tqdm.tqdm as tqdm
-        import seaborn as sns
-        import sdill as pickle
-        dill = pickle
-        import matplotlib.pyplot as plt
-        import stimer
-except Exception as e:
-    print(f'Error in startup script: {e}')    
+except:
+    pass
+for __import_statement in __import_statements:
+    try:
+        exec(f'with demandimport.enabled():{__import_statement}')
+    except Exception as e1:
+        print(f'Cannot lazy import `{__import_statement}`:\n-->{e1}')
+        try:
+            exec(__import_statement)
+        except Exception as e2:
+            print(f'Error on import statement in startup_imports.py `{__import_statement}`:\n-->{e2}')
 
 # check if run in console or in script
 def is_in_script():
@@ -146,3 +144,4 @@ plt.second_monitor = True
 
 # print = pprint_wrapper
 # builtins.print = pprint_wrapper
+
