@@ -1,5 +1,5 @@
 from setuptools import setup
-import os
+import os, sys
 import shutil
 
 
@@ -20,18 +20,19 @@ setup(name='skjerns-utils',
 import sys, os, traceback, types
 
 if __name__=='__main__':
-    try:
-        from tkinter import Tk
-        from tkinter import *
-        from tkinter import messagebox as mb
-        root = Tk()
-        res = mb.askquestion('Copy startup script?', 'Do you want to copy the startup-imports.py to the ipython startup folder? This may have side-effects.\n\nIf you dont know what this does, click "No".')
-        root.destroy()
-        
-        if res == 'yes':
-            home = os.path.expanduser('~')
-            ipython_path  = os.path.join(home, '.ipython', 'profile_default', 'startup')
-            shutil.copy('./startup_imports.py', ipython_path)
-            print('Copied startup-script to', ipython_path)
-    except:
-        print('Could not copy to', ipython_path, '\ncopy manually')
+    if sys.argv[1] == 'install':
+          try:
+              from tkinter import Tk
+              from tkinter import *
+              from tkinter import messagebox as mb
+              root = Tk()
+              res = mb.askquestion('Copy startup script?', 'Do you want to copy the startup-imports.py to the ipython startup folder? This may have side-effects.\n\nIf you dont know what this does, click "No".')
+              root.destroy()
+
+              if res == 'yes':
+                  home = os.path.expanduser('~')
+                  ipython_path  = os.path.join(home, '.ipython', 'profile_default', 'startup')
+                  shutil.copy('./startup_imports.py', ipython_path)
+                  print('Copied startup-script to', ipython_path)
+          except:
+              print('Could not copy to', ipython_path, '\ncopy manually')
