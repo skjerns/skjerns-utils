@@ -1,8 +1,15 @@
 from setuptools import setup
-import os, sys
+import os
+import sys
 import shutil
+import subprocess
 
-
+def install(package):
+    try:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    except Exception:
+        print(f'Could not install {package}')
+            
 setup(name='skjerns-utils',
       version='1.12',
       description='A collection of tools and boiler plate functions',
@@ -11,16 +18,20 @@ setup(name='skjerns-utils',
       author_email='nomail',
       license='GNU 2.0',
       packages=['stimer', 'sdill', 'ospath'],
-      install_requires=['demandimport', 'dill', 'dateparser', 'pyedflib', 'mat73', 'mss', 'lspopt', 'pytablewriter',
-      'pybind11', 'bleak', 'scikit-learn', 'dill','coverage', 'imageio', 'keras', 'natsort', 'pyexcel', 'pyexcel-ods', 'pyexcel-ods3', 'mlxtend',
-      'numba', 'tqdm', 'prettytable', 'pysnooper', 'mne', 'joblib', 'clipboard', 'dateparser', 'umap-learn',
-      'opencv-python', 'pygame', 'python-pptx', 'dominate', 'pyglet', 'python-picard', 'seaborn'],
       zip_safe=False)
 
 import sys, os, traceback, types
 
 if __name__=='__main__':
+    packages = ['demandimport', 'dill', 'dateparser', 'pyedflib', 'mat73', 'mss', 'lspopt', 'pytablewriter',
+                'pybind11', 'bleak', 'scikit-learn', 'dill','coverage', 'imageio', 'keras', 'natsort', 'pyexcel', 'pyexcel-ods', 'pyexcel-ods3', 'mlxtend',
+                'numba', 'tqdm', 'prettytable', 'pysnooper', 'mne', 'joblib', 'clipboard', 'dateparser', 'umap-learn',
+                'opencv-python', 'pygame', 'python-pptx', 'dominate', 'pyglet', 'python-picard', 'seaborn']
+
     if sys.argv[1] == 'install':
+          for package in packages:
+              install(package)
+
           try:
               from tkinter import Tk
               from tkinter import *
