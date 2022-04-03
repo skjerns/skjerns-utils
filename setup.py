@@ -11,12 +11,15 @@ setup(name='skjerns-utils',
       author='skjerns',
       author_email='nomail',
       license='GNU 2.0',
+      install_requires=['tqdm'],
       packages=['stimer', 'sdill', 'ospath'],
       zip_safe=False)
 
 #%% Second part with optional install
 def install(package):
-    with subprocess.Popen([sys.executable, "-m", "pip", "install", package], stdout=subprocess.PIPE, bufsize=0) as p:
+    if isinstance(package, str):
+        package = [package]
+    with subprocess.Popen([sys.executable, "-m", "pip", "install", *package], stdout=subprocess.PIPE, bufsize=0) as p:
         char = p.stdout.read(1)
         while char != b'':
             print(char.decode('UTF-8'), end='', flush=True)
@@ -83,13 +86,23 @@ This may have unexpected side-effects.\n\nIf you dont know what this does, click
         print(msg)
         button1 = Button(self.parent, text="Yes, install\n(not recommended)", command=self.install,
                          width=20, height=2, fg='red')
-        button1.grid(column=3, row=1)
+        button1.grid(column=1, row=1)
         button2 = Button(self.parent, text="No", command=self.destroy, width=10, height=2)
-        button2.grid(column=5, row=1, pady=10)
+        button2.grid(column=2, row=1, pady=10)
         parent.protocol("WM_DELETE_WINDOW", self.redirector.restore)
+       
+        progress= ttk.Progressbar(
+                                parent,
+                                orient='horizontal',
+                                mode='determinate',
+                                length=280,
+                                maximum=len(self.packages)-1
+                            )
+        progress.grid(column=4, row=1, columnspan=5, padx=10, pady=20)
         
         self.button1 = button1
         self.button2 = button2
+        self.progress = progress
         self.parent.after(10000, self.destroy_if_no_action)
         parent.mainloop()    
         
@@ -110,9 +123,11 @@ This may have unexpected side-effects.\n\nIf you dont know what this does, click
         
         print(f'installing packages: {self.packages}\n')
 
-        for package in self.packages:
+        for i, package in enumerate(self.packages):
             if not self.stopped:
+                self.progress['value']=i
                 install(package)
+        self.destroy()           
 
     def destroy(self):
         self.stopped = True
@@ -122,14 +137,17 @@ This may have unexpected side-effects.\n\nIf you dont know what this does, click
         
 
 if __name__=='__main__':
-    packages = ['demandimport', 'dill', 'dateparser', 'pyedflib', 'mat73', 'mss', 'lspopt', 'pytablewriter',
-                'pybind11', 'bleak', 'scikit-learn', 'dill','coverage', 'imageio', 'keras', 'natsort', 'pyexcel', 'pyexcel-ods', 'pyexcel-ods3', 'mlxtend',
-                'numba', 'tqdm', 'prettytable', 'pysnooper', 'mne', 'joblib', 'clipboard', 'dateparser', 'umap-learn',
-                'opencv-python', 'pygame', 'python-pptx', 'dominate', 'pyglet', 'python-picard', 'seaborn']
+    packages = [['numpy', 'scipy', 'scikit-learn', 'joblib', 'numba', 'imageio', 'seaborn'], 
+                ['pyexcel', 'pyexcel-ods', 'pyexcel-ods3', 'python-pptx'],
+                ['mlxtend','umap-learn'], ['mne', 'python-picard'],
+                'demandimport', 'dill', 'pyedflib', 'mat73', 'mss', 'lspopt', 
+                'pytablewriter', 'pybind11', 'bleak', 'coverage', 'keras', 
+                'natsort','prettytable', 'pysnooper', 'clipboard',
+                'dateparser', 'opencv-python', 'pygame', 'dominate', 'pyglet', 
+                'beautifulsoup4']
     if len(sys.argv)==1 or sys.argv[1] != 'egg_info':
           try:
-              import sys, os, traceback, types
-              from tkinter import Tk
+              from tkinter import Tk, ttk
               from tkinter import Text, Button
               InstallPackagesGUI(packages)
           except:
