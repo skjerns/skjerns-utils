@@ -4,16 +4,16 @@ import sys
 import shutil
 import subprocess
 
-setup(name='skjerns-utils',
-      version='1.12',
-      description='A collection of tools and boiler plate functions',
-      url='http://github.com/skjerns/skjerns-utils',
-      author='skjerns',
-      author_email='nomail',
-      license='GNU 2.0',
-      install_requires=['tqdm'],
-      packages=['stimer', 'sdill', 'ospath'],
-      zip_safe=False)
+# setup(name='skjerns-utils',
+#       version='1.12',
+#       description='A collection of tools and boiler plate functions',
+#       url='http://github.com/skjerns/skjerns-utils',
+#       author='skjerns',
+#       author_email='nomail',
+#       license='GNU 2.0',
+#       install_requires=['tqdm'],
+#       packages=['stimer', 'sdill', 'ospath'],
+#       zip_safe=False)
 
 #%% Second part with optional install
 def install(package):
@@ -60,6 +60,7 @@ class InstallPackagesGUI(object):
         self.stopped = False
         self.started = False
         self.packages = packages
+        self.timeout = 15
         
         parent = Tk()
         # parent.overrideredirect(1)
@@ -103,12 +104,16 @@ This may have unexpected side-effects.\n\nIf you dont know what this does, click
         self.button1 = button1
         self.button2 = button2
         self.progress = progress
-        self.parent.after(10000, self.destroy_if_no_action)
+        self.parent.after(1000, self.destroy_if_no_action)
         parent.mainloop()    
         
     def destroy_if_no_action(self):
-        if not self.started:
+        if self.timeout==0:
             self.destroy()
+        elif not self.started:
+            self.button1['text'] = f'Yes, install ({self.timeout})\n(not recommended)'
+            self.timeout-=1
+            self.parent.after(1000, self.destroy_if_no_action)
     
     def install(self):
         self.started = True
