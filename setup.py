@@ -4,16 +4,16 @@ import sys
 import shutil
 import subprocess
 
-# setup(name='skjerns-utils',
-#       version='1.12',
-#       description='A collection of tools and boiler plate functions',
-#       url='http://github.com/skjerns/skjerns-utils',
-#       author='skjerns',
-#       author_email='nomail',
-#       license='GNU 2.0',
-#       install_requires=['tqdm'],
-#       packages=['stimer', 'sdill', 'ospath'],
-#       zip_safe=False)
+setup(name='skjerns-utils',
+      version='1.12',
+      description='A collection of tools and boiler plate functions',
+      url='http://github.com/skjerns/skjerns-utils',
+      author='skjerns',
+      author_email='nomail',
+      license='GNU 2.0',
+      install_requires=['tqdm'],
+      packages=['stimer', 'sdill', 'ospath'],
+      zip_safe=False)
 
 #%% Second part with optional install
 def install(package):
