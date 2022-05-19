@@ -192,11 +192,9 @@ class CPUUsageLogger():
         ax.axvspan(times[curr_seg_start], times[-1], color=next(colors)[1], alpha=0.3)
         myFmt = mdates.DateFormatter('%H:%M:%S')
         ax.xaxis.set_major_formatter(myFmt)
-        
-        plt.ylabel(f'CPU Percentage used by processes "{self.name}"')
-        
+                
         line2 = ax.plot(times, nproc, alpha=1, color='green', linestyle='dotted')
-        ax.set_ylabel(f'Number of processes with name "{self.name}"')
+        ax.set_ylabel(f'CPU Percentage used by processes "{self.name}"')
         
         ax.legend(line1+ line2, ['CPU utilization', '# processes'], loc='lower right')
         plt.show(block=block)
