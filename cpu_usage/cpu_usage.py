@@ -44,7 +44,12 @@ class ProcessEnumerator(Process):
                 self.pids.append(pids)
             except (BrokenPipeError, EOFError):
                 return
-            time.sleep(0.1)
+            try:
+                time.sleep(0.1)
+            except KeyboardInterrupt:
+                self.kill()
+                self.join()
+                return
 
     def stop(self):
         self.running = False
@@ -93,7 +98,9 @@ class CPUUsageLogger():
         self.running = False
         self.manager.shutdown()
         self.thread_loop.join()
-
+        self.proc_enum.stop()
+        self.proc_enum.kill()
+       
     def update_processes(self):
         try:
             pids = self.pids[-1]
@@ -168,18 +175,20 @@ class CPUUsageLogger():
         
         for i, seg in enumerate(segs):
             if seg!=curr_seg:
-                center = times[int(round((curr_seg_start+i)/2))]
-                ax.text(center, 101, curr_seg, fontsize=15, alpha=0.5,
-                         horizontalalignment='center')
+                # center = times[int(round((curr_seg_start+i)/2))]
+                ax.text(times[curr_seg_start+1], 50, curr_seg, fontsize=15, alpha=0.5,
+                        horizontalalignment='left', rotation=90,
+                        verticalalignment='center')
                 ax.axvspan(times[curr_seg_start], times[i], 
                             color=next(colors)[1], 
                             alpha=0.3)
                 curr_seg = seg
                 curr_seg_start = i
                 
-        center = times[int(round((curr_seg_start+i)/2))]
-        ax.text(center, 101, seg, fontsize=15, alpha=0.5,
-                 horizontalalignment='center')
+        # center = times[int(round((curr_seg_start+i)/2))]
+        ax.text(times[curr_seg_start+1], 50, seg, fontsize=15, alpha=0.5,
+                horizontalalignment='left', rotation=90,
+                verticalalignment='center')
         ax.axvspan(times[curr_seg_start], times[-1], color=next(colors)[1], alpha=0.3)
         myFmt = mdates.DateFormatter('%H:%M:%S')
         ax.xaxis.set_major_formatter(myFmt)
@@ -213,11 +222,11 @@ if __name__=='__main__':
             
     self.set_segment_name('half load')
     print('multi core (half load)')
-    Parallel(n_jobs=cpu_count//2)(delayed(dummy_calculation)() for i in range(cpu_count//2))
+    Parallel(n_jobs=-1)(delayed(dummy_calculation)() for i in range(cpu_count//2))
 
     self.set_segment_name('full load')
     print('multi core (full load)')
-    Parallel(n_jobs=cpu_count)(delayed(dummy_calculation)() for i in range(cpu_count))
+    Parallel(n_jobs=-1)(delayed(dummy_calculation)() for i in range(cpu_count))
 
     print('stop')
     self.stop()
