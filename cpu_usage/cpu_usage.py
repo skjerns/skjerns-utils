@@ -99,9 +99,7 @@ class CPUUsageLogger():
             pids = self.pids[-1]
         except BrokenPipeError:
             return
-        
-        print(len(self.processes), len(pids))
-        
+                
         for pid in pids:
             if not (pid in self.processes):
                 try:
@@ -142,7 +140,7 @@ class CPUUsageLogger():
             time.sleep(self.interval/1000)
             
             
-    def plot(self):
+    def plot(self, block=False):
         
         if len(self.data)==0:
             logging.error('Nothing to plot. Maybe logging did not work or process "{self.name}" was not found?')
@@ -192,7 +190,7 @@ class CPUUsageLogger():
         ax.set_ylabel(f'Number of processes with name "{self.name}"')
         
         ax.legend(line1+ line2, ['CPU utilization', '# processes'], loc='lower right')
-             
+        plt.show(block=block)
                 
 
 def dummy_calculation(timeout=5):
