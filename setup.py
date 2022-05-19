@@ -3,16 +3,23 @@ import os
 import sys
 import shutil
 import subprocess
-
+packages = [['numpy', 'scipy', 'scikit-learn', 'joblib', 'numba', 'imageio', 'seaborn'], 
+            ['pyexcel', 'pyexcel-ods', 'pyexcel-ods3', 'python-pptx'],
+            ['mlxtend','umap-learn'], ['mne', 'python-picard'],
+            'demandimport', 'dill', 'pyedflib', 'mat73', 'mss', 'lspopt', 
+            'pytablewriter', 'pybind11', 'bleak', 'coverage', 'keras', 
+            'natsort','prettytable', 'pysnooper', 'clipboard',
+            'dateparser', 'opencv-python', 'pygame', 'dominate', 'pyglet', 
+            'beautifulsoup4', 'wmi']
 setup(name='skjerns-utils',
-      version='1.12',
+      version='1.15',
       description='A collection of tools and boiler plate functions',
       url='http://github.com/skjerns/skjerns-utils',
       author='skjerns',
       author_email='nomail',
       license='GNU 2.0',
       install_requires=['tqdm'],
-      packages=['stimer', 'sdill', 'ospath'],
+      packages=['stimer', 'sdill', 'ospath', 'cpu_usage'],
       zip_safe=False)
 
 #%% Second part with optional install
@@ -142,14 +149,6 @@ This may have unexpected side-effects.\n\nIf you dont know what this does, click
         
 
 if __name__=='__main__':
-    packages = [['numpy', 'scipy', 'scikit-learn', 'joblib', 'numba', 'imageio', 'seaborn'], 
-                ['pyexcel', 'pyexcel-ods', 'pyexcel-ods3', 'python-pptx'],
-                ['mlxtend','umap-learn'], ['mne', 'python-picard'],
-                'demandimport', 'dill', 'pyedflib', 'mat73', 'mss', 'lspopt', 
-                'pytablewriter', 'pybind11', 'bleak', 'coverage', 'keras', 
-                'natsort','prettytable', 'pysnooper', 'clipboard',
-                'dateparser', 'opencv-python', 'pygame', 'dominate', 'pyglet', 
-                'beautifulsoup4']
     if len(sys.argv)==1 or sys.argv[1] != 'egg_info':
           try:
               from tkinter import Tk, ttk

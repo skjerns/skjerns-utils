@@ -6,6 +6,7 @@ try:
     import inspect
     import shutil
     import tempfile
+    import warnings
     import numpy as np
     from pprint import pformat, pprint
 except Exception as e:
@@ -123,6 +124,11 @@ plt.figure = _new_figure
 plt.maximize = True
 plt.second_monitor = True
 
+#%% Change the warnings module such that the source line is not printed
+def warning_on_one_line(message, category, filename, lineno, file=None, line=None):
+    return '%s:%s: %s: %s\n' % (filename, lineno, category.__name__, message)
+
+warnings.formatwarning = warning_on_one_line
 
 # # overwrite print function with pprint
 # def pprint_wrapper(*args, sep=' ', end='\n', file=sys.stdout, flush=False):
