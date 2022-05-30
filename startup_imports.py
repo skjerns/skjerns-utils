@@ -19,12 +19,12 @@ from tqdm import tqdm
 import sdill as pickle
 import matplotlib.pyplot as plt
 import seaborn as sns
-import stimer
 dill = pickle
 """.strip().split('\n')
 
 try:
     import demandimport
+    import stimer
 except:
     pass
 for __import_statement in __import_statements:
