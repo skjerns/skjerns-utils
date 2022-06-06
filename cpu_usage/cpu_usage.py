@@ -87,7 +87,8 @@ class CPUUsageLogger():
         
     def start(self, name='init'):
         if self.running: 
-            logging.warning('already running')
+            self.set_segment_name(name)
+            # logging.warning('already running')
             return
         self.segname=name
         self.running = True
