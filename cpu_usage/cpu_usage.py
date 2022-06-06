@@ -149,7 +149,8 @@ class CPUUsageLogger():
             
             
     def plot(self, block=False):
-        
+        if self.running:
+            self.stop()
         if len(self.data)==0:
             logging.error('Nothing to plot. Maybe logging did not work or process "{self.name}" was not found?')
             return
