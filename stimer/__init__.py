@@ -15,9 +15,8 @@ class CallableModule(types.ModuleType):
         start(self.identifier)
         return None
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, exc_type, exc_val, traceback):
         stop(self.identifier)
-        return True
 
     def __call__(self, identifier='context'):
         self.identifier = identifier

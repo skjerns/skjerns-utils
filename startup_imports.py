@@ -123,6 +123,7 @@ plt._figure = plt.figure
 plt.figure = _new_figure
 plt.maximize = True
 plt.second_monitor = True
+plt.rcParams['svg.fonttype'] = 'none' #when saving svg, keep text as text
 
 #%% Change the warnings module such that the source line is not printed
 def warning_on_one_line(message, category, filename, lineno, file=None, line=None):
