@@ -1,6 +1,6 @@
 import sys
 import types
-from .stimer import start, stop, sleep, lapse, timeit
+from .stimer import start, stop, sleep, lapse, timeit, wrapper
 
 class CallableModule(types.ModuleType):
 
