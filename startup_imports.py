@@ -89,11 +89,15 @@ except AttributeError:
 #### make matplotlib fullscreen on second screen automatically
 
 def check_extended_display():
-    from win32api import GetSystemMetrics
-    t_width, t_height = GetSystemMetrics(79), GetSystemMetrics(78)
-    c_width, c_height = GetSystemMetrics(1), GetSystemMetrics(0)
-    
-    if t_width==c_width and c_height==t_height:
+    """returns true if two monitors are detected and OS=win. Always false on Linux."""
+    try:
+        from win32api import GetSystemMetrics
+        t_width, t_height = GetSystemMetrics(79), GetSystemMetrics(78)
+        c_width, c_height = GetSystemMetrics(1), GetSystemMetrics(0)
+        
+        if t_width==c_width and c_height==t_height:
+            return False
+    except ModuleNotFoundError:
         return False
     return True
 
