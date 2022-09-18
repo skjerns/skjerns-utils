@@ -121,9 +121,10 @@ def _new_figure(num=None, figsize=None, dpi=None, maximize=None,
         maximize = plt.maximize
     second_monitor = second_monitor if second_monitor is not None else plt.second_monitor
     
-    if second_monitor and check_extended_display():
+    window = fig.canvas.manager.window
+    if second_monitor and check_extended_display() and hasattr(window, 'move'):
         fig.canvas.manager.window.move(2100,400)
-    if maximize:
+    if maximize and hasattr(window, 'maximize'):
         fig.canvas.manager.window.showMaximized()
     return fig
 

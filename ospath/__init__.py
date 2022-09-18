@@ -27,7 +27,7 @@ import fnmatch
 from natsort import natsort_key
 
 
-from tkinter.filedialog import askopenfilename, askdirectory
+from tkinter.filedialog import askopenfilename, askdirectory, asksaveasfile
 from tkinter import simpledialog
 from tkinter import  Tk
 
@@ -186,7 +186,8 @@ def list_files(path, exts=None, patterns=None, relative=False,
     
     return sorted(files, key=natsort_key)
 
-def choose_file(default_dir=None,exts='txt', title='Choose file'):
+def choose_file(default_dir=None, exts='txt', title='Choose file',
+                mode='open'):
     """
     Open a file chooser dialoge with tkinter.
     
@@ -198,11 +199,20 @@ def choose_file(default_dir=None,exts='txt', title='Choose file'):
     root.iconify()
     root.update()
     if isinstance(exts, str): exts = [exts]
-    name = askopenfilename(initialdir=None,
+    if mode=='open':
+       name = askopenfilename(initialdir=None,
                            parent=root,
                            title = title,
                            filetypes =(*[("File", "*.{}".format(ext)) for ext in exts],
                                        ("All Files","*.*")))
+    elif mode=='save':
+        name = asksaveasfile(initialdir=None,
+                            parent=root,
+                            title = title,
+                            filetypes =(*[("File", "*.{}".format(ext)) for ext in exts],
+                                        ("All Files","*.*")))
+    else:
+        raise Exception(f'unknown mode: {mode}')
     root.update()
     root.destroy()
     if not os.path.exists(name):
