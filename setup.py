@@ -29,7 +29,7 @@ def install(package):
     with subprocess.Popen([sys.executable, "-m", "pip", "install", *package], stdout=subprocess.PIPE, bufsize=0) as p:
         char = p.stdout.read(1)
         while char != b'':
-            print(char.decode('UTF-8'), end='', flush=True)
+            print(char.decode('UTF-8', 'ignore'), end='', flush=True)
             char = p.stdout.read(1)
 
     if p.returncode: 
@@ -130,6 +130,7 @@ This may have unexpected side-effects.\n\nIf you dont know what this does, click
 
         home = os.path.expanduser('~')
         ipython_path  = os.path.join(home, '.ipython', 'profile_default', 'startup')
+        os.makedirs(ipython_path, exist_ok=True)
         shutil.copy('./startup_imports.py', ipython_path)
         print('Copied startup-script to', ipython_path, '\n')
         

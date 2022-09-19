@@ -27,7 +27,7 @@ import fnmatch
 from natsort import natsort_key
 
 
-from tkinter.filedialog import askopenfilename, askdirectory, asksaveasfile
+from tkinter.filedialog import askopenfilename, askdirectory, asksaveasfilename
 from tkinter import simpledialog
 from tkinter import  Tk
 
@@ -206,11 +206,13 @@ def choose_file(default_dir=None, exts='txt', title='Choose file',
                            filetypes =(*[("File", "*.{}".format(ext)) for ext in exts],
                                        ("All Files","*.*")))
     elif mode=='save':
-        name = asksaveasfile(initialdir=None,
+        name = asksaveasfilename(initialdir=None,
                             parent=root,
                             title = title,
                             filetypes =(*[("File", "*.{}".format(ext)) for ext in exts],
                                         ("All Files","*.*")))
+        if not name.endswith(exts[0]):
+            name += f'.{exts[0]}'
     else:
         raise Exception(f'unknown mode: {mode}')
     root.update()
