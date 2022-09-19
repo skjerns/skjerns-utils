@@ -3,9 +3,9 @@ import os
 import sys
 import shutil
 import subprocess
-packages = [['numpy', 'scipy', 'scikit-learn', 'joblib', 'numba', 'imageio', 'seaborn'], 
+packages = [['numpy', 'scipy', 'scikit-learn', 'joblib', 'numba', 'imageio', 'seaborn', 'h5io'], 
             ['pyexcel', 'pyexcel-ods', 'pyexcel-ods3', 'python-pptx'],
-            ['mlxtend','umap-learn'], ['mne', 'python-picard'],
+            ['mlxtend','umap-learn'], ['mne', 'python-picard', 'autoreject'],
             'demandimport', 'dill', 'pyedflib', 'mat73', 'mss', 'lspopt', 
             'pytablewriter', 'pybind11', 'bleak', 'coverage', 'keras', 
             'natsort','prettytable', 'pysnooper', 'clipboard',
