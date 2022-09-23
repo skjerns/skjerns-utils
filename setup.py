@@ -10,7 +10,7 @@ packages = [['numpy', 'scipy', 'scikit-learn', 'joblib', 'numba', 'imageio', 'se
             'pytablewriter', 'pybind11', 'bleak', 'coverage', 'keras', 
             'natsort','prettytable', 'pysnooper', 'clipboard',
             'dateparser', 'opencv-python', 'pygame', 'dominate', 'pyglet', 
-            'beautifulsoup4', 'wmi']
+            'beautifulsoup4', 'wmi', 'networkx']
 setup(name='skjerns-utils',
       version='1.15',
       description='A collection of tools and boiler plate functions',

@@ -10,7 +10,7 @@ try:
     import numpy as np
     from pprint import pformat, pprint
 except Exception as e:
-    print(f'Error in startup script: {e}')    
+    print(f'[startup_imports] Error while loading builtin modules: {e}')    
 
     
 # these libraries are maybe not present
@@ -120,12 +120,15 @@ def _new_figure(num=None, figsize=None, dpi=None, maximize=None,
     if maximize is None and not 'figsize' in kwargs:
         maximize = plt.maximize
     second_monitor = second_monitor if second_monitor is not None else plt.second_monitor
-    
+
     window = fig.canvas.manager.window
     if second_monitor and check_extended_display() and hasattr(window, 'move'):
         fig.canvas.manager.window.move(2100,400)
-    if maximize and hasattr(window, 'maximize'):
-        fig.canvas.manager.window.showMaximized()
+    if maximize:
+        if hasattr(window, 'showMaximized'):
+            fig.canvas.manager.window.showMaximized()
+        else:
+            print(f"Can't maximize figure for window: {window}. showMaximized() not found")
     return fig
 
 def _pause_without_putting_figure_on_top(time):
