@@ -138,7 +138,8 @@ def _pause_without_putting_figure_on_top(time):
         fig = plt.figure(fignum)
         fig.canvas.draw_idle()
         fig.canvas.start_event_loop(td)
-    else:
+        
+    if len(figs)==0:
         plt._pause(time)
         
         
