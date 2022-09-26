@@ -131,16 +131,19 @@ def _new_figure(num=None, figsize=None, dpi=None, maximize=None,
             print(f"Can't maximize figure for window: {window}. showMaximized() not found")
     return fig
 
-def _pause_without_putting_figure_on_top(time):
+def _pause_without_putting_figure_on_top(interval):
     figs = plt.get_fignums()
-    td = time/len(figs) if len(figs)>0 else time
+    
+    if len(figs)==0:
+        return plt._pause(interval)
+        
+    td = interval/len(figs)
     for fignum in figs:
         fig = plt.figure(fignum)
         fig.canvas.draw_idle()
         fig.canvas.start_event_loop(td)
         
-    if len(figs)==0:
-        plt._pause(time)
+
         
         
 plt._pause = plt.pause
