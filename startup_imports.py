@@ -1,5 +1,12 @@
 # standard imports
 try:
+    # Dummy exception. Just for correct linting in file.
+    raise Exception()
+    plt, get_ipython = None  # will not actually be executed
+except:
+    pass
+
+try:
     import os
     import sys
     import unittest
