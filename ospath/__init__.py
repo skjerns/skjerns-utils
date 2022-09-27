@@ -187,7 +187,7 @@ def list_files(path, exts=None, patterns=None, relative=False,
     
     return sorted(files, key=natsort_key)
 
-def choose_files(default_dir=None, exts='txt', title='Choose file'):
+def choose_files(default_dir=None, exts='txt', title='Choose one or multiple files'):
     """
     Open a file chooser dialoge with tkinter for multiple files.
     
