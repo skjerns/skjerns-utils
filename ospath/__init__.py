@@ -27,7 +27,8 @@ import fnmatch
 from natsort import natsort_key
 
 
-from tkinter.filedialog import askopenfilename, askdirectory, asksaveasfilename
+from tkinter.filedialog import askdirectory, asksaveasfilename
+from tkinter.filedialog import askopenfilename, askopenfilenames 
 from tkinter import simpledialog
 from tkinter import  Tk
 
@@ -185,6 +186,32 @@ def list_files(path, exts=None, patterns=None, relative=False,
         files = [join(file) for file in files]
     
     return sorted(files, key=natsort_key)
+
+def choose_files(default_dir=None, exts='txt', title='Choose file'):
+    """
+    Open a file chooser dialoge with tkinter for multiple files.
+    
+    :param default_dir: Where to open the dir, if set to None, will start at wdir
+    :param exts: A string or list of strings with extensions etc: 'txt' or ['txt','csv']
+    :returns: the chosen file
+    """
+    root = Tk()
+    root.iconify()
+    root.update()
+    if isinstance(exts, str): exts = [exts]
+    name = askopenfilenames(initialdir=None,
+                        parent=root,
+                        title = title,
+                        filetypes =(*[("File", "*.{}".format(ext)) for ext in exts],
+                                    ("All Files","*.*")))
+
+    root.update()
+    root.destroy()
+    if not name:
+        print("No file chosen")
+    else:
+        return name
+
 
 def choose_file(default_dir=None, exts='txt', title='Choose file',
                 mode='open'):
