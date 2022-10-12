@@ -135,7 +135,8 @@ def _new_figure(num=None, figsize=None, dpi=None, maximize=None,
         if hasattr(window, 'showMaximized'):
             fig.canvas.manager.window.showMaximized()
         else:
-            print(f"Can't maximize figure for window: {window}. showMaximized() not found")
+            print(f"[startup_imports.py] Can't maximize figure for window:"
+                  f"{fig.canvas.manager}.{window}. showMaximized() not found")
     return fig
 
 def _pause_without_putting_figure_on_top(interval):
