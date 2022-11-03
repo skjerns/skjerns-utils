@@ -100,7 +100,8 @@ def commonpath(paths):
     return join(paths)
 
 
-def list_folders(path, subfolders=False, add_parent=False, pattern='*'):
+def list_folders(path, recursive=False, add_parent=False, pattern='*',
+                 subfolders=None):
     """
     This function will list all folders or subfolders of a certain directory
     
@@ -108,24 +109,31 @@ def list_folders(path, subfolders=False, add_parent=False, pattern='*'):
     :param subfolders: include subfolders of folders
     :returns: A list of folders and optionally subfolders
     """
+    if subfolders is not None:
+        import warnings
+        warnings.warn("`subfolders` is deprecated, use `recursive=` instead", DeprecationWarning)
+        recursive = subfolders
+        
     path += '/'
     path = join(path)
+    
     assert isdir(path), '{} is not a directory'.format(path)
     folders = []
+    
     if add_parent: folders = [path]
     
     for foldername in next(os.walk(path))[1]:
         folder = join(path, foldername, '/')
         if fnmatch.fnmatch(foldername.lower(), pattern.lower()):
             folders.append(folder)
-        if subfolders:
-            folders.extend(list_folders(folder, subfolders=True,
+        if recursive:
+            folders.extend(list_folders(folder, recursive=True,
                                         add_parent=False, pattern=pattern))
         
     return sorted(folders, key=natsort_key)
 
-def list_files(path, exts=None, patterns=None, relative=False, 
-               subfolders=False, return_strings=True, only_folders=False,
+def list_files(path, exts=None, patterns=None, relative=False, recursive=False,
+               subfolders=None, return_strings=True, only_folders=False,
                max_results=None):
     """
     will make a list of all files with extention exts (list)
@@ -147,6 +155,12 @@ def list_files(path, exts=None, patterns=None, relative=False,
     :return:      list of file names
     :type:        list of str
     """
+    
+    if subfolders is not None:
+        import warnings
+        warnings.warn("`subfolders` is deprecated, use `recursive=` instead", DeprecationWarning)
+        recursive = subfolders
+    
     if isinstance(exts, str): exts = [exts]
     if isinstance(patterns, str): patterns = [patterns]
     assert isinstance(path, str), "path needs to be a str"
@@ -163,7 +177,7 @@ def list_files(path, exts=None, patterns=None, relative=False,
         patterns.append(pattern.lower())
     
     # if recursiveness is asked, prepend the double asterix to each pattern
-    if subfolders: patterns = ['**/' + pattern for pattern in patterns]   
+    if recursive: patterns = ['**/' + pattern for pattern in patterns]   
     
     # collect files for each pattern
     files = []
