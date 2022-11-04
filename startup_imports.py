@@ -148,9 +148,7 @@ def _pause_without_putting_figure_on_top(interval):
         fig = plt.figure(fignum)
         fig.canvas.draw_idle()
         fig.canvas.start_event_loop(td)
-        
-
-        
+                
         
 plt._pause = plt.pause
 plt.pause = _pause_without_putting_figure_on_top

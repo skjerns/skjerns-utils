@@ -12,7 +12,7 @@ packages = [['numpy', 'scipy', 'scikit-learn', 'joblib', 'numba', 'imageio', 'se
             'dateparser', 'opencv-python', 'pygame', 'dominate', 'pyglet', 
             'beautifulsoup4', 'wmi', 'networkx']
 setup(name='skjerns-utils',
-      version='1.15',
+      version='1.16',
       description='A collection of tools and boiler plate functions',
       url='http://github.com/skjerns/skjerns-utils',
       author='skjerns',
@@ -92,9 +92,12 @@ This may have unexpected side-effects.\n\nIf you dont know what this does, click
         
         self.redirector = Redirector(self.text_box)
         print(msg)
-        button1 = Button(self.parent, text="Yes, install\n(not recommended)", command=self.install,
+        button1 = Button(self.parent, text="Yes, install all\n(not recommended)", command=self.install,
                          width=20, height=2, fg='red')
-        button1.grid(column=1, row=1)
+        button1.grid(column=0, row=1)
+        button12 = Button(self.parent, text="Copy only startup script\n(not recommended)",
+                          command=self.copy_only_startup_script,  width=20, height=2, fg='darkorange')
+        button12.grid(column=1, row=1)
         button2 = Button(self.parent, text="No", command=self.destroy, width=10, height=2)
         button2.grid(column=2, row=1, pady=10)
         parent.protocol("WM_DELETE_WINDOW", self.redirector.restore)
@@ -118,9 +121,22 @@ This may have unexpected side-effects.\n\nIf you dont know what this does, click
         if self.timeout==0:
             self.destroy()
         elif not self.started:
-            self.button1['text'] = f'Yes, install ({self.timeout})\n(not recommended)'
+            self.button2['text'] = f'No ({self.timeout})'
             self.timeout-=1
             self.parent.after(1000, self.destroy_if_no_action)
+    
+    def copy_only_startup_script(self):
+        self.copy_startup_script()
+        self.parent.after(1000, self.destroy)
+
+        
+    def copy_startup_script(self):
+        home = os.path.expanduser('~')
+        ipython_path  = os.path.join(home, '.ipython', 'profile_default', 'startup')
+        os.makedirs(ipython_path, exist_ok=True)
+        shutil.copy('./startup_imports.py', ipython_path)
+        print('Copied startup-script to', ipython_path, '\n')
+    
     
     def install(self):
         self.started = True
@@ -128,14 +144,10 @@ This may have unexpected side-effects.\n\nIf you dont know what this does, click
         self.button1['state'] = 'disable'
         self.button2['text'] = 'Stop'
 
-        home = os.path.expanduser('~')
-        ipython_path  = os.path.join(home, '.ipython', 'profile_default', 'startup')
-        os.makedirs(ipython_path, exist_ok=True)
-        shutil.copy('./startup_imports.py', ipython_path)
-        print('Copied startup-script to', ipython_path, '\n')
+        self.copy_startup_script()
         
         print(f'installing packages: {self.packages}\n')
-
+        
         for i, package in enumerate(self.packages):
             if not self.stopped:
                 self.progress['value']=i
