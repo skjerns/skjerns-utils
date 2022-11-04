@@ -109,8 +109,7 @@ def check_extended_display():
     return True
 
 
-def _new_figure(num=None, figsize=None, dpi=None, maximize=None,
-                second_monitor=None, **kwargs):
+def _new_figure(num=None, figsize=None, dpi=None, **kwargs):
     """
     This convenience function creates figures 
     on the second screen automatically and maximizes
@@ -124,14 +123,13 @@ def _new_figure(num=None, figsize=None, dpi=None, maximize=None,
     is_windowed = hasattr(fig.canvas.manager, 'window')
     if not is_windowed: return fig
     
-    if maximize is None and not 'figsize' in kwargs:
-        maximize = plt.maximize
-    second_monitor = second_monitor if second_monitor is not None else plt.second_monitor
-
+    # move window to second screen
     window = fig.canvas.manager.window
-    if second_monitor and check_extended_display() and hasattr(window, 'move'):
+    if plt.second_monitor and check_extended_display() and hasattr(window, 'move'):
         fig.canvas.manager.window.move(2100,400)
-    if maximize:
+        
+    # maximizing window
+    if plt.maximize and figsize is None:
         if hasattr(window, 'showMaximized'):
             fig.canvas.manager.window.showMaximized()
         else:
