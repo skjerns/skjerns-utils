@@ -10,7 +10,10 @@ packages = [['numpy', 'scipy', 'scikit-learn', 'joblib', 'numba', 'imageio', 'se
             'pytablewriter', 'pybind11', 'bleak', 'coverage', 'keras', 
             'natsort','prettytable', 'pysnooper', 'clipboard',
             'dateparser', 'opencv-python', 'pygame', 'dominate', 'pyglet', 
-            'beautifulsoup4', 'wmi', 'networkx', 'numpyencoder', 'compress-pickle']
+            'beautifulsoup4', 'wmi', 'networkx', 'numpyencoder', 'compress-pickle',
+            'absl-py']
+if sys.platform=='linux':
+    packages += ['jax'] 
 
 setup(name='skjerns-utils',
       version='1.16',
