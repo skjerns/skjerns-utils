@@ -23,7 +23,7 @@ setup(name='skjerns-utils',
       author_email='nomail',
       license='GNU 2.0',
       install_requires=['tqdm', 'natsort'],
-      packages=['stimer', 'sdill', 'ospath', 'cpu_usage'],
+      packages=['stimer', 'ospath', 'cpu_usage'],
       zip_safe=False)
 
 #%% Second part with optional install
