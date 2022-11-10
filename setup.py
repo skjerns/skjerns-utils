@@ -11,7 +11,7 @@ packages = [['numpy', 'scipy', 'scikit-learn', 'joblib', 'numba', 'imageio', 'se
             'natsort','prettytable', 'pysnooper', 'clipboard',
             'dateparser', 'opencv-python', 'pygame', 'dominate', 'pyglet', 
             'beautifulsoup4', 'wmi', 'networkx', 'numpyencoder', 'compress-pickle',
-            'absl-py']
+            'absl-py', 'lz4']
 if sys.platform=='linux':
     packages += ['jax'] 
 
@@ -22,7 +22,7 @@ setup(name='skjerns-utils',
       author='skjerns',
       author_email='nomail',
       license='GNU 2.0',
-      install_requires=['tqdm'],
+      install_requires=['tqdm', 'natsort'],
       packages=['stimer', 'sdill', 'ospath', 'cpu_usage'],
       zip_safe=False)
 
