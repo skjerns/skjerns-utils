@@ -134,8 +134,8 @@ def list_folders(path, recursive=False, add_parent=False, pattern='*',
     return sorted(folders, key=natsort_key)
 
 def list_files(path, exts=None, patterns=None, relative=False, recursive=False,
-               subfolders=None, return_strings=True, only_folders=False,
-               max_results=None):
+               subfolders=None, only_folders=False, max_results=None, 
+               case_sensitive=False):
     """
     will make a list of all files with extention exts (list)
     found in the path and possibly all subfolders and return
@@ -156,7 +156,10 @@ def list_files(path, exts=None, patterns=None, relative=False, recursive=False,
     :return:      list of file names
     :type:        list of str
     """
-    
+    def insensitive_glob(pattern):
+        f = lambda c: '[%s%s]' % (c.lower(), c.upper()) if c.isalpha() else c
+        return ''.join(map(f, pattern))
+
     if subfolders is not None:
         import warnings
         warnings.warn("`subfolders` is deprecated, use `recursive=` instead", DeprecationWarning)
@@ -184,7 +187,8 @@ def list_files(path, exts=None, patterns=None, relative=False, recursive=False,
     files = []
     fcount = 0
     for pattern in patterns:
-        # pattern = 
+        if not case_sensitive:
+            pattern = insensitive_glob(pattern)
         for filename in Path(path).glob(pattern):
             if filename.is_file() and filename not in files: 
                 files.append(filename)
@@ -194,12 +198,12 @@ def list_files(path, exts=None, patterns=None, relative=False, recursive=False,
     
     # turn path into relative or absolute paths
     files = [file.relative_to(path) if relative else file.absolute() for file in files]
-        
+    files = [join(file) for file in files]
+
+    files = set(files)  # filter duplicates    
     # by default: return strings instead of Path objects
-    if return_strings: 
-        files = [join(file) for file in files]
-    
     return sorted(files, key=natsort_key)
+
 
 def choose_files(default_dir=None, exts='txt', title='Choose one or multiple files'):
     """
@@ -227,8 +231,8 @@ def choose_files(default_dir=None, exts='txt', title='Choose one or multiple fil
         return name
 
 
-def choose_file(default_dir=None, exts='txt', title='Choose file',
-                mode='open'):
+def choose_file(default_dir=None, default_file=None, exts='txt', 
+                title='Choose file', mode='open'):
     """
     Open a file chooser dialoge with tkinter.
     
@@ -241,17 +245,19 @@ def choose_file(default_dir=None, exts='txt', title='Choose file',
     root.update()
     if isinstance(exts, str): exts = [exts]
     if mode=='open':
-       name = askopenfilename(initialdir=None,
-                           parent=root,
-                           title = title,
-                           filetypes =(*[("File", "*.{}".format(ext)) for ext in exts],
-                                       ("All Files","*.*")))
+       name = askopenfilename(initialdir=default_dir,
+                              default_file=default_file,
+                              parent=root,
+                              title = title,
+                              filetypes =(*[("File", "*.{}".format(ext)) for ext in exts],
+                                           ("All Files","*.*")))
     elif mode=='save':
-        name = asksaveasfilename(initialdir=None,
-                            parent=root,
-                            title = title,
-                            filetypes =(*[("File", "*.{}".format(ext)) for ext in exts],
-                                        ("All Files","*.*")))
+        name = asksaveasfilename(initialdir=default_dir,
+                              default_file=default_file,
+                              parent=root,
+                              title = title,
+                              filetypes =(*[("File", "*.{}".format(ext)) for ext in exts],
+                                         ("All Files","*.*")))
         if not name.endswith(exts[0]):
             name += f'.{exts[0]}'
     else:
