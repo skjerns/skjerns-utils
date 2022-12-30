@@ -1,6 +1,6 @@
 ## skjerns-utils
 
-This repository includes three packages: `sDill`, `sTimer` and `ospath`.
+This repository includes three packages: `cpu_usage` `sTimer` and `ospath`.
 
 Additionally it has some custom files like `startup.py` for `iPython` or a bat file to create an icon for Spyder
 
