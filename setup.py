@@ -11,7 +11,7 @@ packages = [['numpy', 'scipy', 'scikit-learn', 'joblib', 'numba', 'imageio', 'se
             'natsort','prettytable', 'pysnooper', 'clipboard',
             'dateparser', 'opencv-python', 'pygame', 'dominate', 'pyglet', 
             'beautifulsoup4', 'wmi', 'networkx', 'numpyencoder', 'compress-pickle',
-            'absl-py', 'lz4', 'monitorcontrol']
+            'absl-py', 'lz4', 'monitorcontrol', 'alog', 'sleep_utils']
 
 if sys.platform=='linux':
     packages += ['jax'] 
