@@ -17,16 +17,15 @@ try:
     import numpy as np
     from pprint import pformat, pprint
 except Exception as e:
-    print(f'[startup_imports] Error while loading builtin modules: {e}')    
+    print(f'[startup_imports] Error while loading builtin modules: {e}')
 
-    
+
 # these libraries are maybe not present
 __import_statements = """
 from tqdm import tqdm
-import sdill as pickle
+import pickle
 import matplotlib.pyplot as plt
 import seaborn as sns
-dill = pickle
 """.strip().split('\n')
 
 try:
@@ -101,7 +100,7 @@ def check_extended_display():
         from win32api import GetSystemMetrics
         t_width, t_height = GetSystemMetrics(79), GetSystemMetrics(78)
         c_width, c_height = GetSystemMetrics(1), GetSystemMetrics(0)
-        
+
         if t_width==c_width and c_height==t_height:
             return False
     except ModuleNotFoundError:
@@ -111,23 +110,23 @@ def check_extended_display():
 
 def _new_figure(num=None, figsize=None, dpi=None, **kwargs):
     """
-    This convenience function creates figures 
+    This convenience function creates figures
     on the second screen automatically and maximizes
-    """       
+    """
     if num is not None and num in plt.get_fignums():
         return plt._figure(num=num, figsize=figsize, dpi=dpi, **kwargs)
-    
+
     fig = plt._figure(num=num, figsize=figsize, dpi=dpi, **kwargs)
 
     # check if we are actually running a window or are in an inline-plot
     is_windowed = hasattr(fig.canvas.manager, 'window')
     if not is_windowed: return fig
-    
+
     # move window to second screen
     window = fig.canvas.manager.window
     if plt.second_monitor and check_extended_display() and hasattr(window, 'move'):
         fig.canvas.manager.window.move(2100,400)
-        
+
     # maximizing window
     if plt.maximize and figsize is None:
         if hasattr(window, 'showMaximized'):
@@ -139,17 +138,17 @@ def _new_figure(num=None, figsize=None, dpi=None, **kwargs):
 
 def _pause_without_putting_figure_on_top(interval):
     figs = plt.get_fignums()
-    
+
     if len(figs)==0:
         return plt._pause(interval)
-        
+
     td = interval/len(figs)
     for fignum in figs:
         fig = plt.figure(fignum)
         fig.canvas.draw_idle()
         fig.canvas.start_event_loop(td)
-                
-        
+
+
 plt._pause = plt.pause
 plt.pause = _pause_without_putting_figure_on_top
 
@@ -185,4 +184,3 @@ warnings.formatwarning = warning_on_one_line
 
 # print = pprint_wrapper
 # builtins.print = pprint_wrapper
-
