@@ -5,13 +5,13 @@ import shutil
 import subprocess
 packages = [['numpy', 'scipy', 'scikit-learn', 'joblib', 'numba', 'imageio', 'seaborn', 'h5io'], 
             ['pyexcel', 'pyexcel-ods', 'pyexcel-ods3', 'python-pptx'],
-            ['mlxtend','umap-learn'], ['mne', 'python-picard', 'autoreject'],
-            'demandimport', 'dill', 'pyedflib', 'mat73', 'mss', 'lspopt', 
-            'pytablewriter', 'pybind11', 'bleak', 'coverage', 'keras', 
+            ['mne', 'python-picard', 'autoreject'],
+            'demandimport', 'dill', 'pyedflib', 'mat73', 'lspopt', 
+            'pytablewriter', 'pybind11', 'bleak', 'coverage', 
             'natsort','prettytable', 'pysnooper', 'clipboard',
             'dateparser', 'opencv-python', 'pygame', 'dominate', 'pyglet', 
             'beautifulsoup4', 'wmi', 'networkx', 'numpyencoder', 'compress-pickle',
-            'absl-py', 'lz4', 'monitorcontrol', 'alog', 'sleep_utils', 'pingouin', 'cloudant']
+            'absl-py', 'lz4', 'monitorcontrol', 'alog', 'sleep_utils', 'pingouin']
 
 if sys.platform=='linux':
     packages += ['jax'] 
