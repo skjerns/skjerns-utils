@@ -82,7 +82,7 @@ class InstallPackagesGUI(object):
         parent.resizable(False, False)
         msg = """Do you want to 
         
-    - copy the startup-imports.py to the ipython startup folder and
+    - copy the startup-imports.py to the ipython startup folder, set spyder.ini and
     - install the optional dependencies?
     
 This may have unexpected side-effects.\n\nIf you dont know what this does, click "No".
@@ -100,7 +100,7 @@ This may have unexpected side-effects.\n\nIf you dont know what this does, click
         button1 = Button(self.parent, text="Yes, install all\n(not recommended)", command=self.install,
                          width=20, height=2, fg='red')
         button1.grid(column=0, row=1)
-        button12 = Button(self.parent, text="Copy only startup script\n(not recommended)",
+        button12 = Button(self.parent, text="Copy only startup script and spyder.ini\n(not recommended)",
                           command=self.copy_only_startup_script,  width=20, height=2, fg='darkorange')
         button12.grid(column=1, row=1)
         button2 = Button(self.parent, text="No", command=self.destroy, width=10, height=2)
@@ -122,6 +122,7 @@ This may have unexpected side-effects.\n\nIf you dont know what this does, click
         self.parent.after(1000, self.destroy_if_no_action)
         parent.mainloop()    
         
+        
     def destroy_if_no_action(self):
         if self.timeout==0:
             self.destroy()
@@ -130,11 +131,26 @@ This may have unexpected side-effects.\n\nIf you dont know what this does, click
             self.timeout-=1
             self.parent.after(1000, self.destroy_if_no_action)
     
+    
     def copy_only_startup_script(self):
         self.copy_startup_script()
+        self.copy_spyder_ini()
         self.parent.after(1000, self.destroy)
 
+
+    def copy_spyder_ini(self):
+        try:
+            import spyder
+            conf_dir = spyder.config.base.get_conf_path()
+        except ModuleNotFoundError:
+            conf_dir = f'{os.path.expanduser("~")}/'
+            
+        spyder_ini = f'{conf_dir}/config/spyder.ini'
         
+        shutil.copy('./spyder.ini', spyder_ini)
+        print('Copied spyder.ini to', spyder_ini, '\n')
+
+         
     def copy_startup_script(self):
         home = os.path.expanduser('~')
         ipython_path  = os.path.join(home, '.ipython', 'profile_default', 'startup')
@@ -150,6 +166,7 @@ This may have unexpected side-effects.\n\nIf you dont know what this does, click
         self.button2['text'] = 'Stop'
 
         self.copy_startup_script()
+        self.copy_spyder_ini()
         
         print(f'installing packages: {self.packages}\n')
         
