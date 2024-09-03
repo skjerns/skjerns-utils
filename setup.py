@@ -23,8 +23,8 @@ setup(name='skjerns-utils',
       author='skjerns',
       author_email='nomail',
       license='GNU 2.0',
-      install_requires=['tqdm', 'natsort'],
-      packages=['stimer', 'ospath', 'cpu_usage', 'telegram_exception_send'],
+      install_requires=['tqdm', 'natsort', 'telegram-send==0.34'],
+      packages=['stimer', 'ospath', 'cpu_usage', 'telegram_send_exception'],
       zip_safe=False)
 
 #%% Second part with optional install
