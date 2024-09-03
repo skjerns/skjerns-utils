@@ -12,8 +12,10 @@ import telegram_send_exception_forward
 
 Now, any uncaught exception will result in a telegram message to your bot
 
+![](md_assets/2024-09-03-14-59-54-image.png)
+
 ```python
 3/0 # raises ZeroDivisionError
 ```
 
-In the background, the exception overwrites the `sys.excepthook` with its own functionality.
+In the background, the exception overwrites and monkey-patches the `sys.excepthook` with its the telegram sending logic, then raises the exception to the original excepthook of Python.

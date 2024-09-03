@@ -3,6 +3,9 @@ import sys
 import time
 import traceback
 from html import escape
+# bugfix monkeypatch
+import telegram
+telegram.constants.MAX_MESSAGE_LENGTH = 4096
 import telegram_send
 import threading
 
