@@ -8,6 +8,10 @@ Prerequesit: You have to install and setup `telegram-send` on you machine. Verif
 
 ```Python
 import telegram_send_exception_forward
+
+# now raise an exception to check if it works
+# this will likely not work in an interactive session
+3/0 # raises ZeroDivisionError
 ```
 
 Now, any uncaught exception will result in a telegram message to your bot
