@@ -141,6 +141,7 @@ This may have unexpected side-effects.\n\nIf you dont know what this does, click
     def copy_spyder_ini(self):
         try:
             import spyder
+            spyder.get_versions()
             conf_dir = spyder.config.base.get_conf_path()
         except ModuleNotFoundError:
             conf_dir = f'{os.path.expanduser("~")}/'
