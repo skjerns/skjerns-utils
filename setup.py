@@ -8,7 +8,7 @@ packages = [['numpy', 'scipy', 'scikit-learn', 'joblib', 'numba', 'imageio', 'se
             ['mne', 'python-picard', 'autoreject'],
             'demandimport', 'dill', 'pyedflib', 'mat73', 'lspopt', 
             'pytablewriter', 'pybind11', 'bleak', 'coverage', 
-            'natsort','prettytable', 'pysnooper', 'clipboard',
+            'natsort','prettytable', 'pysnooper', 'clipboard', 'telegram-send'
             'dateparser', 'opencv-python', 'pygame', 'dominate', 'pyglet', 
             'beautifulsoup4', 'wmi', 'networkx', 'numpyencoder', 'compress-pickle',
             'absl-py', 'lz4', 'monitorcontrol', 'alog', 'sleep_utils', 'pingouin']
@@ -24,7 +24,7 @@ setup(name='skjerns-utils',
       author_email='nomail',
       license='GNU 2.0',
       install_requires=['tqdm', 'natsort'],
-      packages=['stimer', 'ospath', 'cpu_usage'],
+      packages=['stimer', 'ospath', 'cpu_usage', 'telegram_exception_send'],
       zip_safe=False)
 
 #%% Second part with optional install
