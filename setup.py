@@ -23,7 +23,7 @@ setup(name='skjerns-utils',
       author='skjerns',
       author_email='nomail',
       license='GNU 2.0',
-      install_requires=['tqdm', 'natsort', 'telegram-send==0.34'],
+      install_requires=['tqdm', 'natsort', 'python-telegram-bot==13.5', 'telegram-send==0.34'],
       packages=['stimer', 'ospath', 'cpu_usage', 'telegram_send_exception'],
       zip_safe=False)
 
@@ -144,7 +144,12 @@ This may have unexpected side-effects.\n\nIf you dont know what this does, click
             spyder.get_versions()
             conf_dir = spyder.config.base.get_conf_path()
         except ModuleNotFoundError:
-            conf_dir = f'{os.path.expanduser("~")}/'
+            home = os.path.expanduser("~")
+            for conf_dir in [f'{home}/.spyder-py3/', f'{home}/.config/spyder-py3/']:
+                if os.path.exists(conf_dir):
+                    break
+            else:
+                print('NO SPYDER DIR FOUND')
             
         spyder_ini = f'{conf_dir}/config/spyder.ini'
         
