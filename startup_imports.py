@@ -162,6 +162,9 @@ plt.rcParams['svg.fonttype'] = 'none' #when saving svg, keep text as text
 def warning_on_one_line(message, category, filename, lineno, file=None, line=None):
     return '%s:%s: %s: %s\n' % (filename, lineno, category.__name__, message)
 
+#%% wurn off numpy scientific notation printing
+np.set_printoptions(suppress=True)
+
 warnings.formatwarning = warning_on_one_line
 
 # # overwrite print function with pprint
