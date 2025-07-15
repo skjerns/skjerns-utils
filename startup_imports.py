@@ -214,7 +214,7 @@ def _inject(fig):
     def _on_key(evt):
         if evt.key and evt.key.lower() in ("ctrl+c", "control+c"):
             _copy_figure_to_clipboard(fig)
-            print("[startup_imports] Figure copied to clipboard")
+            print("\n[startup_imports] Figure copied to clipboard")
 
     fig.canvas.mpl_connect("key_press_event", _on_key)
     fig._auto_injected = True
