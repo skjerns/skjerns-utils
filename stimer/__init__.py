@@ -1,6 +1,7 @@
 import sys
 import types
 from .stimer import start, stop, sleep, lapse, timeit, wrapper
+from .lineprofiler import LineProfiler
 
 class CallableModule(types.ModuleType):
 
@@ -24,6 +25,3 @@ class CallableModule(types.ModuleType):
 
 
 sys.modules[__name__] = CallableModule()
-
-
-    

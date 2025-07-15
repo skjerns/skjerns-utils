@@ -33,6 +33,7 @@ import seaborn as sns
 
 try:
     import demandimport
+    from stimer import LineProfiler
     import stimer
 except:
     pass
