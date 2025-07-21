@@ -17,7 +17,7 @@ if sys.platform=='linux':
     packages += ['jax'] 
 
 setup(name='skjerns-utils',
-      version='1.16',
+      version='1.17',
       description='A collection of tools and boiler plate functions',
       url='http://github.com/skjerns/skjerns-utils',
       author='skjerns',

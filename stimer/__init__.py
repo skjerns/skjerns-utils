@@ -1,7 +1,7 @@
 import sys
 import types
 from .stimer import start, stop, sleep, lapse, timeit, wrapper
-from .lineprofiler import LineProfiler
+from .contextprofiler import ContextProfiler
 
 class CallableModule(types.ModuleType):
 
