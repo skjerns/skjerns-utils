@@ -56,6 +56,7 @@ packages_opt = [
     "compress-pickle",
     "lz4",
     "monitorcontrol",
+    "requests>=2.27.0"
 ]
 if sys.platform.startswith("linux"):
     packages_opt += ["jax"]
@@ -68,7 +69,7 @@ setup(
     author="skjerns",
     author_email="nomail",
     license="GNU 2.0",
-    install_requires=["tqdm", "natsort", "python-telegram-bot==13.5", "telegram-send==0.34"],
+    install_requires=["tqdm", "natsort", "python-telegram-bot==13.5", "telegram-send==0.34", "requests>=2.27.0"],
     packages=["stimer", "ospath", "cpu_usage", "telegram_send_exception"],
     zip_safe=False,
 )
