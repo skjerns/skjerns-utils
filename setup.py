@@ -22,23 +22,22 @@ import subprocess
 import sys
 from pathlib import Path
 from collections import deque
+import traceback
 
 # -----------------------------------------------------------------------------#
 # Core metadata + mandatory requirements
 # -----------------------------------------------------------------------------#
 packages_opt = [
     # heavy numerical / plotting
-    ["numpy", "scipy", "scikit-learn", "joblib", "numba", "imageio", "seaborn", "h5io"],
+    ["numpy", "scipy", "scikit-learn", "joblib", "numba", "imageio", "seaborn",
+     "h5io", "pingouin", "mat73", "numpyencoder", "networkx", "pandas", "statsmodels"],
     # file-format helpers
     ["pyexcel", "pyexcel-ods", "pyexcel-ods3", "python-pptx"],
     # EEG / M/EEG stack
-    ["mne", "python-picard", "autoreject"],
+    ["mne", "python-picard", "autoreject", "sleep_utils", "lspopt"],
+    ["alog", "absl-py"],
     # misc singletons
-    "demandimport",
-    "dill",
     "pyedflib",
-    "mat73",
-    "lspopt",
     "pytablewriter",
     "pybind11",
     "bleak",
@@ -47,7 +46,6 @@ packages_opt = [
     "prettytable",
     "pysnooper",
     "clipboard",
-    "telegram-send",
     "dateparser",
     "opencv-python",
     "pygame",
@@ -55,15 +53,9 @@ packages_opt = [
     "pyglet",
     "beautifulsoup4",
     "wmi",
-    "networkx",
-    "numpyencoder",
     "compress-pickle",
-    "absl-py",
     "lz4",
     "monitorcontrol",
-    "alog",
-    "sleep_utils",
-    "pingouin",
 ]
 if sys.platform.startswith("linux"):
     packages_opt += ["jax"]
@@ -166,101 +158,145 @@ class Redirector:
 # -----------------------------------------------------------------------------#
 # Tk-inter GUI
 # -----------------------------------------------------------------------------#
+
 class InstallPackagesGUI:
+    """Optional configuration dialog for skjerns-utils (final layout)."""
+
     def __init__(self, optional_packages):
         import tkinter as tk
-        from tkinter import ttk, Text, Button  # local import → no dependency for headless
+        from tkinter import ttk, Text
 
-        # ---------------- state ----------------
-        self.pkgs = optional_packages
-        self.timeout = 15
-        self.counting = True  # stop after first action
+        # ───────── configuration ────────────────────────────────────────────
+        self.pkgs     = optional_packages
+        self.timeout  = 15           # auto-close in s
+        self.counting = True         # stop when a cb is toggled
 
-        # ---------------- root -----------------
+        # ───────── root window ──────────────────────────────────────────────
         self.root = tk.Tk()
-        self.root.configure(bg="black")
-        self.root.eval("tk::PlaceWindow . center")
         self.root.title("Optional configuration")
+        self.root.configure(bg="black")
         self.root.resizable(False, False)
+        self.root.eval("tk::PlaceWindow . center")
 
-        # ---------------- console --------------
-        self.text_box = Text(
-            self.root,
-            wrap="word",
-            height=20,
-            width=120,
-            bg="black",
-            fg="white",
-            font=("Consolas", 10),
+        # ───────── top section (check-boxes + action button) ────────────────
+        top = tk.Frame(self.root, bg="black")
+        top.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
+
+        # --- check-boxes (all start unchecked) -----------------------------
+        self.var_spyder   = tk.BooleanVar(master=self.root, value=False)
+        self.var_startup  = tk.BooleanVar(master=self.root, value=False)
+        self.var_deps     = tk.BooleanVar(master=self.root, value=False)
+
+        self.chk_spyder  = tk.Checkbutton(
+            top, text="install spyder.ini",
+            variable=self.var_spyder, command=self._on_select,
+            bg="black", fg="white", anchor="w", selectcolor="black",
         )
-        self.text_box.grid(column=0, row=0, columnspan=9, sticky="nsew", padx=5, pady=5)
+        self.chk_startup = tk.Checkbutton(
+            top, text="install ipython startup_imports.py",
+            variable=self.var_startup, command=self._on_select,
+            bg="black", fg="white", anchor="w", selectcolor="black",
+        )
+        self.chk_deps    = tk.Checkbutton(
+            top, text="install additional packages",
+            variable=self.var_deps, command=self._on_select,
+            bg="black", fg="white", anchor="w", selectcolor="black",
+        )
+
+        self.chk_spyder.pack(fill="x", anchor="w")
+        self.chk_startup.pack(fill="x", anchor="w")
+        self.chk_deps.pack(fill="x", anchor="w")
+
+        # --- action button --------------------------------------------------
+        self.btn_action = tk.Button(
+            top, text=f"Close ({self.timeout})", width=14,
+            fg="green", command=self._on_action
+        )
+        self.btn_action.pack(side="right", padx=12, pady=2)
+
+        # ───────── console (middle) ─────────────────────────────────────────
+        self.text_box = Text(
+            self.root, wrap="word", height=18, width=110,
+            bg="black", fg="white", font=("Consolas", 10)
+        )
+        self.text_box.grid(row=1, column=0, padx=6, sticky="nsew")
         self.redirect = Redirector(self.text_box, self.root)
 
-        print(
-            "You may now\n"
-            " 1) copy startup_imports.py to the IPython startup folder\n"
-            " 2) copy spyder.ini to your Spyder profile\n"
-            " 3) install optional dependencies\n\n"
-            "Choose nothing to continue unmodified.\n"
-        )
-
-        # ---------------- buttons --------------
-        self.btn_startup = Button(
-            self.root,
-            text="Copy IPython startup script",
-            command=self._action_startup,
-            width=28,
-            height=2,
-        )
-        self.btn_startup.grid(column=0, row=1, padx=2, pady=6)
-
-        self.btn_spyder = Button(
-            self.root,
-            text="Copy spyder.ini",
-            command=self._action_spyder,
-            width=20,
-            height=2,
-        )
-        self.btn_spyder.grid(column=1, row=1, padx=2)
-
-        self.btn_install = Button(
-            self.root,
-            text="Install optional deps",
-            command=self._action_install,
-            width=24,
-            height=2,
-            fg="red",
-        )
-        self.btn_install.grid(column=2, row=1, padx=2)
-
-        self.btn_continue = Button(
-            self.root,
-            text=f"Continue ({self.timeout})",
-            command=self._destroy,
-            width=12,
-            height=2,
-            fg="green",
-        )
-        self.btn_continue.grid(column=3, row=1, padx=10)
-
-        # ---------------- progress bar ---------
+        # ───────── progress bar (bottom) ────────────────────────────────────
         self.progress = ttk.Progressbar(
-            self.root,
-            orient="horizontal",
-            mode="determinate",
-            maximum=len(self.pkgs),
-            length=320,
+            self.root, orient="horizontal", mode="determinate",
+            maximum=len(self.pkgs), length=500
         )
-        self.progress.grid(column=4, row=1, columnspan=5, padx=10, pady=8)
+        self.progress.grid(row=2, column=0, padx=6, pady=(4,6), sticky="ew")
 
-        # ---------------- wiring ---------------
+        # optional explanatory blurb
+        print(
+            "Select the desired optional actions (checkboxes).\nIf you're unsure what to do, just click close.\n"
+            "Otherwise, the dialog closes automatically.\n"
+        )
+
+        # ───────── event wiring / countdown ─────────────────────────────────
         self.root.after(1000, self._countdown)
         self.root.protocol("WM_DELETE_WINDOW", self._destroy)
         self.root.mainloop()
 
-    # ---------------------------------------------------------------------
-    # Countdown management
-    # ---------------------------------------------------------------------
+    # ------------------------------------------------------------------ helpers
+    def _on_select(self, *_):
+        """User toggled at least one checkbox → stop timer, change button."""
+        if self.counting:
+            self.counting = False
+            self.btn_action.config(text="Install", fg="red")
+
+    def _start_close_timer(self, secs: int = 15) -> None:
+        self._close_timeout = secs
+        self._tick_close_timer()
+
+    def _tick_close_timer(self) -> None:
+        if self._close_timeout <= 0:
+            self._destroy()
+            return
+        self.btn_action.config(text=f"Close ({self._close_timeout})")
+        self._close_timeout -= 1
+        self.root.after(1000, self._tick_close_timer)
+
+    def _on_action(self):
+        """Run selected tasks once, then turn the button into a real ‘Close’."""
+
+        # If we are already in “close” mode → just close
+        if getattr(self, "_actions_done", False):
+            self._destroy()
+            return
+
+        if self.counting:          # timer expired without interaction
+            self._destroy()
+            return
+
+        # disable further changes
+        self.chk_spyder.config(state="disabled")
+        self.chk_startup.config(state="disabled")
+        self.chk_deps.config(state="disabled")
+        self.btn_action.config(state="disabled")
+
+        # perform selected tasks
+        if self.var_spyder.get():
+            self._copy_spyder()
+        if self.var_startup.get():
+            self._copy_startup()
+        if self.var_deps.get():
+            self._install_pkgs()
+
+        # ➌ finished: convert button to a *true* close-button
+        self._actions_done = True               # flag: tasks already executed
+        self.btn_action.config(
+            text="Close (15)",
+            fg="green",
+            state="normal",
+            command=self._destroy,               # single-click → close
+        )
+
+        # ➍ kick off post-install auto-close
+        self._start_close_timer(secs=15)
+    # ---------------------------------------------------------------- countdown
     def _countdown(self):
         if not self.counting:
             return
@@ -268,34 +304,10 @@ class InstallPackagesGUI:
             self._destroy()
             return
         self.timeout -= 1
-        self.btn_continue.config(text=f"Continue ({self.timeout})")
+        self.btn_action.config(text=f"Close ({self.timeout})")
         self.root.after(1000, self._countdown)
 
-    def _stop_countdown(self):
-        self.counting = False
-        self.btn_continue.config(text="Continue")
-
-    # ---------------------------------------------------------------------
-    # Actions
-    # ---------------------------------------------------------------------
-    def _action_startup(self):
-        self._stop_countdown()
-        self.btn_startup.config(state="disabled")
-        self._copy_startup()
-
-    def _action_spyder(self):
-        self._stop_countdown()
-        self.btn_spyder.config(state="disabled")
-        self._copy_spyder()
-
-    def _action_install(self):
-        self._stop_countdown()
-        self.btn_install.config(state="disabled")
-        self._install_pkgs()
-
-    # ---------------------------------------------------------------------
-    # Helpers
-    # ---------------------------------------------------------------------
+    # ---------------------------------------------------------------- actions
     def _copy_startup(self):
         dst = Path.home() / ".ipython" / "profile_default" / "startup"
         dst.mkdir(parents=True, exist_ok=True)
@@ -304,15 +316,14 @@ class InstallPackagesGUI:
 
     def _copy_spyder(self):
         try:
-            import spyder  # noqa: F401  (import to locate config)
+            import spyder  # noqa: F401
             conf_dir = Path(spyder.config.base.get_conf_path())
         except ModuleNotFoundError:
             home = Path.home()
-            for p in (home / ".spyder-py3", home / ".config" / "spyder-py3"):
-                conf_dir = p
-                if p.exists():
-                    break
-            else:
+            conf_dir = next((p for p in
+                             (home / ".spyder-py3", home / ".config" / "spyder-py3")
+                             if p.exists()), None)
+            if conf_dir is None:
                 print("✗ No Spyder configuration directory found.\n")
                 return
         dst = conf_dir / "config" / "spyder.ini"
@@ -321,15 +332,16 @@ class InstallPackagesGUI:
         print(f"✓ Copied spyder.ini → {dst}\n")
 
     def _install_pkgs(self):
+        if not self.pkgs:
+            return
         print("Starting installation of optional dependencies …\n")
         for idx, pkg in enumerate(self.pkgs, start=1):
             self.progress["value"] = idx
-            _pip_install(pkg)
+            if not _pip_install(pkg):
+                break
         print("\n✓ All requested packages processed.\n")
 
-    # ---------------------------------------------------------------------
-    # Shutdown
-    # ---------------------------------------------------------------------
+    # ---------------------------------------------------------------- shutdown
     def _destroy(self):
         self.redirect.restore()
         self.root.destroy()
@@ -345,3 +357,4 @@ if __name__ == "__main__":
             InstallPackagesGUI(packages_opt)
         except Exception as exc:  # headless build / missing Tk etc.
             print(f"GUI creation failed – continuing without optional setup. ({exc})")
+            print(traceback.format_exc())
