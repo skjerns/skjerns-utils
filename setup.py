@@ -1,199 +1,347 @@
-from setuptools import setup
-import os
-import sys
-import shutil
-import subprocess
-packages = [['numpy', 'scipy', 'scikit-learn', 'joblib', 'numba', 'imageio', 'seaborn', 'h5io'], 
-            ['pyexcel', 'pyexcel-ods', 'pyexcel-ods3', 'python-pptx'],
-            ['mne', 'python-picard', 'autoreject'],
-            'demandimport', 'dill', 'pyedflib', 'mat73', 'lspopt', 
-            'pytablewriter', 'pybind11', 'bleak', 'coverage', 
-            'natsort','prettytable', 'pysnooper', 'clipboard', 'telegram-send'
-            'dateparser', 'opencv-python', 'pygame', 'dominate', 'pyglet', 
-            'beautifulsoup4', 'wmi', 'networkx', 'numpyencoder', 'compress-pickle',
-            'absl-py', 'lz4', 'monitorcontrol', 'alog', 'sleep_utils', 'pingouin']
+"""
+setup.py for `skjerns-utils`.
 
-if sys.platform=='linux':
-    packages += ['jax'] 
+• Installs the core package in editable/develop mode
+• Presents an optional Tk-GUI that can
+    1. copy `startup_imports.py` into IPython’s startup folder
+    2. copy `spyder.ini` into the active Spyder profile
+    3. install a list of optional dependencies
+    4. continue without changes (auto-closes after timeout)
 
-setup(name='skjerns-utils',
-      version='1.17',
-      description='A collection of tools and boiler plate functions',
-      url='http://github.com/skjerns/skjerns-utils',
-      author='skjerns',
-      author_email='nomail',
-      license='GNU 2.0',
-      install_requires=['tqdm', 'natsort', 'python-telegram-bot==13.5', 'telegram-send==0.34'],
-      packages=['stimer', 'ospath', 'cpu_usage', 'telegram_send_exception'],
-      zip_safe=False)
-
-#%% Second part with optional install
-def install(package):
-    if isinstance(package, str):
-        package = [package]
-    with subprocess.Popen([sys.executable, "-m", "pip", "install", *package], stdout=subprocess.PIPE, bufsize=0) as p:
-        char = p.stdout.read(1)
-        while char != b'':
-            print(char.decode('UTF-8', 'ignore'), end='', flush=True)
-            char = p.stdout.read(1)
-
-    if p.returncode: 
-        print(f'\t!!! Could not install {package}\n', flush=True)
-
-
-class Redirector(object):
-    def __init__(self, text_widget):
-        self.text_space = text_widget
-        self._stderr = sys.stderr
-        self._stdout = sys.stdout
-        sys.stdout = self
-        sys.stderr = self
-
-    def write(self, *args, **kwargs):
-        self.text_space.insert('end', ' '.join(args))
-        self.text_space.see('end')     
-        self._stdout.write(*args, **kwargs)
-        self.text_space.parent.update_idletasks()
-        self.text_space.parent.update()
-        
-    def flush(self, *args, **kwargs):
-        self._stderr.flush(*args)
-        self._stdout.flush(**kwargs)
-     
-    def restore(self):
-        sys.stderr = self._stderr
-        sys.stdout = self._stdout
-        
-        
-        
-class InstallPackagesGUI(object):
-    
-    def __init__(self, packages):
-        self.stopped = False
-        self.started = False
-        self.packages = packages
-        self.timeout = 15
-        
-        parent = Tk()
-        # parent.overrideredirect(1)
-        parent.configure(bg="black")
-        parent.eval('tk::PlaceWindow . center')
-        parent.title("Install optional dependencies?")
-        parent.resizable(False, False)
-        msg = """Do you want to 
-        
-    - copy the startup-imports.py to the ipython startup folder, set spyder.ini and
-    - install the optional dependencies?
-    
-This may have unexpected side-effects.\n\nIf you dont know what this does, click "No".
+All action buttons disable themselves once clicked; the global countdown
+stops on first interaction. Console output is mirrored into the GUI.
 """
 
-        self.parent = parent
-        
-        self.text_box = Text(self.parent, wrap='word', height = 20, width=120,
-                             background='black', foreground='white', font=('Consolas', 10))
-        self.text_box.grid(column=0, row=0, columnspan = 9, sticky='NSWE', padx=5, pady=5)
-        self.text_box.parent = parent
-        
-        self.redirector = Redirector(self.text_box)
-        print(msg)
-        button1 = Button(self.parent, text="Yes, install all\n(not recommended)", command=self.install,
-                         width=20, height=2, fg='red')
-        button1.grid(column=0, row=1)
-        button12 = Button(self.parent, text="Copy only startup script and spyder.ini\n(not recommended)",
-                          command=self.copy_only_startup_script,  width=20, height=2, fg='darkorange')
-        button12.grid(column=1, row=1)
-        button2 = Button(self.parent, text="No", command=self.destroy, width=10, height=2)
-        button2.grid(column=2, row=1, pady=10)
-        parent.protocol("WM_DELETE_WINDOW", self.redirector.restore)
-       
-        progress= ttk.Progressbar(
-                                parent,
-                                orient='horizontal',
-                                mode='determinate',
-                                length=280,
-                                maximum=len(self.packages)-1
-                            )
-        progress.grid(column=4, row=1, columnspan=5, padx=10, pady=20)
-        
-        self.button1 = button1
-        self.button2 = button2
-        self.progress = progress
-        self.parent.after(1000, self.destroy_if_no_action)
-        parent.mainloop()    
-        
-        
-    def destroy_if_no_action(self):
-        if self.timeout==0:
-            self.destroy()
-        elif not self.started:
-            self.button2['text'] = f'No ({self.timeout})'
-            self.timeout-=1
-            self.parent.after(1000, self.destroy_if_no_action)
-    
-    
-    def copy_only_startup_script(self):
-        self.copy_startup_script()
-        self.copy_spyder_ini()
-        self.parent.after(1000, self.destroy)
+from __future__ import annotations
+
+from setuptools import setup
+
+import os
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+from collections import deque
+
+# -----------------------------------------------------------------------------#
+# Core metadata + mandatory requirements
+# -----------------------------------------------------------------------------#
+packages_opt = [
+    # heavy numerical / plotting
+    ["numpy", "scipy", "scikit-learn", "joblib", "numba", "imageio", "seaborn", "h5io"],
+    # file-format helpers
+    ["pyexcel", "pyexcel-ods", "pyexcel-ods3", "python-pptx"],
+    # EEG / M/EEG stack
+    ["mne", "python-picard", "autoreject"],
+    # misc singletons
+    "demandimport",
+    "dill",
+    "pyedflib",
+    "mat73",
+    "lspopt",
+    "pytablewriter",
+    "pybind11",
+    "bleak",
+    "coverage",
+    "natsort",
+    "prettytable",
+    "pysnooper",
+    "clipboard",
+    "telegram-send",
+    "dateparser",
+    "opencv-python",
+    "pygame",
+    "dominate",
+    "pyglet",
+    "beautifulsoup4",
+    "wmi",
+    "networkx",
+    "numpyencoder",
+    "compress-pickle",
+    "absl-py",
+    "lz4",
+    "monitorcontrol",
+    "alog",
+    "sleep_utils",
+    "pingouin",
+]
+if sys.platform.startswith("linux"):
+    packages_opt += ["jax"]
+
+setup(
+    name="skjerns-utils",
+    version="1.17",
+    description="A collection of tools and boiler-plate functions",
+    url="http://github.com/skjerns/skjerns-utils",
+    author="skjerns",
+    author_email="nomail",
+    license="GNU 2.0",
+    install_requires=["tqdm", "natsort", "python-telegram-bot==13.5", "telegram-send==0.34"],
+    packages=["stimer", "ospath", "cpu_usage", "telegram_send_exception"],
+    zip_safe=False,
+)
+
+# -----------------------------------------------------------------------------#
+# Helper for installing optional packages
+# -----------------------------------------------------------------------------#
+def _pip_install(pkg, err_tail: int = 20) -> bool:
+    """
+    Install one or more packages with pip and stream output line-by-line.
+
+    Parameters
+    ----------
+    pkg : str | Sequence[str]
+        Package name or an iterable of package names.
+    err_tail : int, default 20
+        Number of trailing output lines to repeat if the installation fails.
+
+    Returns
+    -------
+    bool
+        True if ``pip`` exited with return-code 0, otherwise False.
+
+    Notes
+    -----
+    * ``stderr`` is merged into ``stdout`` to ensure error messages are visible
+      in real-time.
+    * If the command fails, the last *err_tail* lines are replayed so that the
+      user can immediately see the relevant error context above the ☓ banner.
+    """
+    cmd: list[str] = (
+        [sys.executable, "-m", "pip", "install", *pkg]
+        if isinstance(pkg, (list, tuple, set))
+        else [sys.executable, "-m", "pip", "install", str(pkg)]
+    )
+
+    # Ring buffer to keep the most recent lines for later replay if needed
+    recent: deque[str] = deque(maxlen=err_tail)
+
+    with subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,      # merge stderr → stdout
+        text=True,                     # decode bytes automatically
+        bufsize=1,                     # line-buffered
+    ) as proc:
+        for line in proc.stdout:       # iterate line-by-line
+            print(line, end="", flush=True)
+            recent.append(line)
+
+    if proc.returncode != 0:
+        banner = f"\n✗ Could not install {pkg!r} (exit code {proc.returncode})"
+        print(banner, flush=True)
+        if recent:
+            print("─────────── last pip messages ───────────", flush=True)
+            for line in recent:
+                print(line, end="", flush=True)
+        return False
+
+    return True
+
+# -----------------------------------------------------------------------------#
+# Redirect stdout/stderr to Tk.Text widget
+# -----------------------------------------------------------------------------#
+class Redirector:
+    def __init__(self, text_widget, root):
+        self.text = text_widget
+        self.root = root
+        self._orig_out, self._orig_err = sys.stdout, sys.stderr
+        sys.stdout = sys.stderr = self
+
+    def write(self, *args, **kwargs):
+        self.text.insert("end", " ".join(args))
+        self.text.see("end")
+        self._orig_out.write(*args, **kwargs)
+        self.root.update_idletasks()
+        self.root.update()
+
+    def flush(self, *args, **kwargs):  # needed for Python >= 3.7
+        self._orig_out.flush()
+        self._orig_err.flush()
+
+    def restore(self):
+        sys.stdout, sys.stderr = self._orig_out, self._orig_err
 
 
-    def copy_spyder_ini(self):
+# -----------------------------------------------------------------------------#
+# Tk-inter GUI
+# -----------------------------------------------------------------------------#
+class InstallPackagesGUI:
+    def __init__(self, optional_packages):
+        import tkinter as tk
+        from tkinter import ttk, Text, Button  # local import → no dependency for headless
+
+        # ---------------- state ----------------
+        self.pkgs = optional_packages
+        self.timeout = 15
+        self.counting = True  # stop after first action
+
+        # ---------------- root -----------------
+        self.root = tk.Tk()
+        self.root.configure(bg="black")
+        self.root.eval("tk::PlaceWindow . center")
+        self.root.title("Optional configuration")
+        self.root.resizable(False, False)
+
+        # ---------------- console --------------
+        self.text_box = Text(
+            self.root,
+            wrap="word",
+            height=20,
+            width=120,
+            bg="black",
+            fg="white",
+            font=("Consolas", 10),
+        )
+        self.text_box.grid(column=0, row=0, columnspan=9, sticky="nsew", padx=5, pady=5)
+        self.redirect = Redirector(self.text_box, self.root)
+
+        print(
+            "You may now\n"
+            " 1) copy startup_imports.py to the IPython startup folder\n"
+            " 2) copy spyder.ini to your Spyder profile\n"
+            " 3) install optional dependencies\n\n"
+            "Choose nothing to continue unmodified.\n"
+        )
+
+        # ---------------- buttons --------------
+        self.btn_startup = Button(
+            self.root,
+            text="Copy IPython startup script",
+            command=self._action_startup,
+            width=28,
+            height=2,
+        )
+        self.btn_startup.grid(column=0, row=1, padx=2, pady=6)
+
+        self.btn_spyder = Button(
+            self.root,
+            text="Copy spyder.ini",
+            command=self._action_spyder,
+            width=20,
+            height=2,
+        )
+        self.btn_spyder.grid(column=1, row=1, padx=2)
+
+        self.btn_install = Button(
+            self.root,
+            text="Install optional deps",
+            command=self._action_install,
+            width=24,
+            height=2,
+            fg="red",
+        )
+        self.btn_install.grid(column=2, row=1, padx=2)
+
+        self.btn_continue = Button(
+            self.root,
+            text=f"Continue ({self.timeout})",
+            command=self._destroy,
+            width=12,
+            height=2,
+            fg="green",
+        )
+        self.btn_continue.grid(column=3, row=1, padx=10)
+
+        # ---------------- progress bar ---------
+        self.progress = ttk.Progressbar(
+            self.root,
+            orient="horizontal",
+            mode="determinate",
+            maximum=len(self.pkgs),
+            length=320,
+        )
+        self.progress.grid(column=4, row=1, columnspan=5, padx=10, pady=8)
+
+        # ---------------- wiring ---------------
+        self.root.after(1000, self._countdown)
+        self.root.protocol("WM_DELETE_WINDOW", self._destroy)
+        self.root.mainloop()
+
+    # ---------------------------------------------------------------------
+    # Countdown management
+    # ---------------------------------------------------------------------
+    def _countdown(self):
+        if not self.counting:
+            return
+        if self.timeout == 0:
+            self._destroy()
+            return
+        self.timeout -= 1
+        self.btn_continue.config(text=f"Continue ({self.timeout})")
+        self.root.after(1000, self._countdown)
+
+    def _stop_countdown(self):
+        self.counting = False
+        self.btn_continue.config(text="Continue")
+
+    # ---------------------------------------------------------------------
+    # Actions
+    # ---------------------------------------------------------------------
+    def _action_startup(self):
+        self._stop_countdown()
+        self.btn_startup.config(state="disabled")
+        self._copy_startup()
+
+    def _action_spyder(self):
+        self._stop_countdown()
+        self.btn_spyder.config(state="disabled")
+        self._copy_spyder()
+
+    def _action_install(self):
+        self._stop_countdown()
+        self.btn_install.config(state="disabled")
+        self._install_pkgs()
+
+    # ---------------------------------------------------------------------
+    # Helpers
+    # ---------------------------------------------------------------------
+    def _copy_startup(self):
+        dst = Path.home() / ".ipython" / "profile_default" / "startup"
+        dst.mkdir(parents=True, exist_ok=True)
+        shutil.copy("startup_imports.py", dst)
+        print(f"✓ Copied startup_imports.py → {dst}\n")
+
+    def _copy_spyder(self):
         try:
-            import spyder
-            spyder.get_versions()
-            conf_dir = spyder.config.base.get_conf_path()
+            import spyder  # noqa: F401  (import to locate config)
+            conf_dir = Path(spyder.config.base.get_conf_path())
         except ModuleNotFoundError:
-            home = os.path.expanduser("~")
-            for conf_dir in [f'{home}/.spyder-py3/', f'{home}/.config/spyder-py3/']:
-                if os.path.exists(conf_dir):
+            home = Path.home()
+            for p in (home / ".spyder-py3", home / ".config" / "spyder-py3"):
+                conf_dir = p
+                if p.exists():
                     break
             else:
-                print('NO SPYDER DIR FOUND')
-            
-        spyder_ini = f'{conf_dir}/config/spyder.ini'
-        
-        shutil.copy('./spyder.ini', spyder_ini)
-        print('Copied spyder.ini to', spyder_ini, '\n')
+                print("✗ No Spyder configuration directory found.\n")
+                return
+        dst = conf_dir / "config" / "spyder.ini"
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy("spyder.ini", dst)
+        print(f"✓ Copied spyder.ini → {dst}\n")
 
-         
-    def copy_startup_script(self):
-        home = os.path.expanduser('~')
-        ipython_path  = os.path.join(home, '.ipython', 'profile_default', 'startup')
-        os.makedirs(ipython_path, exist_ok=True)
-        shutil.copy('./startup_imports.py', ipython_path)
-        print('Copied startup-script to', ipython_path, '\n')
-    
-    
-    def install(self):
-        self.started = True
-        
-        self.button1['state'] = 'disable'
-        self.button2['text'] = 'Stop'
+    def _install_pkgs(self):
+        print("Starting installation of optional dependencies …\n")
+        for idx, pkg in enumerate(self.pkgs, start=1):
+            self.progress["value"] = idx
+            _pip_install(pkg)
+        print("\n✓ All requested packages processed.\n")
 
-        self.copy_startup_script()
-        self.copy_spyder_ini()
-        
-        print(f'installing packages: {self.packages}\n')
-        
-        for i, package in enumerate(self.packages):
-            if not self.stopped:
-                self.progress['value']=i
-                install(package)
-        self.destroy()           
+    # ---------------------------------------------------------------------
+    # Shutdown
+    # ---------------------------------------------------------------------
+    def _destroy(self):
+        self.redirect.restore()
+        self.root.destroy()
 
-    def destroy(self):
-        self.stopped = True
-        self.redirector.restore()
-        self.parent.destroy()
-        
-        
 
-if __name__=='__main__':
-    if len(sys.argv)==1 or sys.argv[1] != 'egg_info':
-          try:
-              from tkinter import Tk, ttk
-              from tkinter import Text, Button
-              InstallPackagesGUI(packages)
-          except:
-              pass
+# -----------------------------------------------------------------------------#
+# Entry-point
+# -----------------------------------------------------------------------------#
+if __name__ == "__main__":
+    # Running via `pip install -e .` passes arguments; skip GUI when building metadata
+    if len(sys.argv) == 1 or sys.argv[1] != "egg_info":
+        try:
+            InstallPackagesGUI(packages_opt)
+        except Exception as exc:  # headless build / missing Tk etc.
+            print(f"GUI creation failed – continuing without optional setup. ({exc})")
