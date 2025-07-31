@@ -34,7 +34,7 @@ packages_opt = [
     # file-format helpers
     ["pyexcel", "pyexcel-ods", "pyexcel-ods3", "python-pptx"],
     # EEG / M/EEG stack
-    ["mne", "python-picard", "autoreject", "sleep_utils", "lspopt"],
+    ["mne", "python-picard", "autoreject", "sleep_utils", "lspopt", "pybids"],
     ["alog", "absl-py"],
     # misc singletons
     "pyedflib",
@@ -56,7 +56,8 @@ packages_opt = [
     "compress-pickle",
     "lz4",
     "monitorcontrol",
-    "requests>=2.27.0"
+    "requests>=2.27.0",
+    
 ]
 if sys.platform.startswith("linux"):
     packages_opt += ["jax"]

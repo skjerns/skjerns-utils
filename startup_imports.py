@@ -12,27 +12,11 @@ import warnings
 import subprocess
 import unittest
 
-# lazy loading of external modules
-def lazy_import(name):
-    try:
-        spec = importlib.util.find_spec(name)
-        module = importlib.util.module_from_spec(spec)
-        loader = importlib.util.LazyLoader(spec.loader)
-        spec.loader = loader
-        sys.modules[name] = module
-        loader.exec_module(module)
-        return module
-
-    except AttributeError as e:
-        print(f"[startup_imports] Failed to load '{name}': {e}")
-    return None
-
 try:
-    np = lazy_import('numpy')
-    tqdm = lazy_import('tqdm').tqdm
-    mlp = lazy_import('matplotlib')
-    pickle = lazy_import('pickle')
-    sns = lazy_import('seaborn')
+    import numpy as np
+    from tqdm import tqdm
+    import matplotlib as mlp
+    import seaborn as sns
 except Exception as e:
     print(f'[startup_imports] Error while loading module: {e}')
 
