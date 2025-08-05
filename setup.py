@@ -57,7 +57,6 @@ packages_opt = [
     "lz4",
     "monitorcontrol",
     "requests>=2.27.0",
-    
 ]
 if sys.platform.startswith("linux"):
     packages_opt += ["jax"]
@@ -145,7 +144,10 @@ class Redirector:
     def write(self, *args, **kwargs):
         self.text.insert("end", " ".join(args))
         self.text.see("end")
-        self._orig_out.write(*args, **kwargs)
+        try:
+            self._orig_out.write(*args, **kwargs)
+        except UnicodeEncodeError:
+            pass
         self.root.update_idletasks()
         self.root.update()
 
