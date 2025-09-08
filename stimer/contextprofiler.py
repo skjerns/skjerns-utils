@@ -102,16 +102,18 @@ class _ProfilerImpl:
             self._lines[lineno] = linecache.getline(filename, lineno).strip()
 
     def _print_results(self):
-        """Formats and prints the profiling results."""
+        """Formats and prints the profiling results with aligned columns."""
         if not self._timings:
-            # This can happen if the with-block is empty
             print("No lines were profiled in the block.")
             return
 
         total_time = sum(self._timings.values())
-
         sorted_linenos = sorted(self._timings.keys())
+
+        # Determine field widths
         max_lineno_width = len(str(max(sorted_linenos))) if sorted_linenos else 0
+        max_time_width = 7  # fixed for "%.4f"
+        max_pct_width = 5   # fixed for "%.1f"
 
         print("-" * 80)
         print("Line-by-Line Profile:")
@@ -122,9 +124,12 @@ class _ProfilerImpl:
             percentage = (line_time / total_time) * 100 if total_time > 0 else 0
             line_text = self._lines.get(lineno, "")
 
+            # Format: %LINENUMBER %PERCENTAGE %TIME %LINECONTENT
             print(
-                f"L{lineno:<{max_lineno_width}} {line_text:<40} - "
-                f"{line_time:.4f}s - {percentage:.1f}%"
+                # f"{lineno:0{max_lineno_width}d}  "
+                f"{percentage:04.1f}% "
+                f"{line_time:07.4f}s | "
+                f"{line_text}"
             )
 
         print("-" * 80)
