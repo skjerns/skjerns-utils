@@ -13,6 +13,8 @@ import subprocess
 import unittest
 
 try:
+    import stimer
+    from stimer import ContextProfiler
     import numpy as np
     from tqdm import tqdm
     import matplotlib as mlp

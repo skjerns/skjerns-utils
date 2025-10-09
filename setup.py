@@ -63,7 +63,7 @@ if sys.platform.startswith("linux"):
 
 setup(
     name="skjerns-utils",
-    version="1.17",
+    version="1.18",
     description="A collection of tools and boiler-plate functions",
     url="http://github.com/skjerns/skjerns-utils",
     author="skjerns",
