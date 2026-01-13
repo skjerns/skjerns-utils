@@ -29,13 +29,13 @@ import traceback
 # -----------------------------------------------------------------------------#
 packages_opt = [
     # heavy numerical / plotting
-    ["numpy", "scipy", "scikit-learn", "joblib", "numba", "imageio", "seaborn",
-     "h5io", "pingouin", "mat73", "numpyencoder", "networkx", "pandas", "statsmodels"],
+    "numpy", "scipy", "scikit-learn", "joblib", "numba", "imageio", "seaborn",
+     "h5io", "pingouin", "mat73", "numpyencoder", "networkx", "pandas", "statsmodels",
     # file-format helpers
-    ["pyexcel", "pyexcel-ods", "pyexcel-ods3", "python-pptx"],
+    "pyexcel", "pyexcel-ods", "pyexcel-ods3", "python-pptx",
     # EEG / M/EEG stack
-    ["mne", "python-picard", "autoreject", "sleep_utils", "lspopt", "pybids"],
-    ["alog", "absl-py"],
+    "mne", "python-picard", "autoreject", "sleep_utils", "lspopt", "pybids",
+    "alog", "absl-py",
     # misc singletons
     "pyedflib",
     "pytablewriter",
@@ -127,6 +127,7 @@ def _pip_install(pkg, err_tail: int = 20) -> bool:
             print("─────────── last pip messages ───────────", flush=True)
             for line in recent:
                 print(line, end="", flush=True)
+
         return False
 
     return True
@@ -339,9 +340,16 @@ class InstallPackagesGUI:
         if not self.pkgs:
             return
         print("Starting installation of optional dependencies …\n")
+        all_pks = []
+        for pkg in self.pkgs:
+            all_pks += [pkg] if isinstance(pkg, str) else pkg
+
         for idx, pkg in enumerate(self.pkgs, start=1):
             self.progress["value"] = idx
             if not _pip_install(pkg):
+                
+                print('install manually by running:\npip install {all_pks}')
+
                 break
         print("\n✓ All requested packages processed.\n")
 
