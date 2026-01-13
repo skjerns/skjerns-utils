@@ -27,110 +27,78 @@ import traceback
 # -----------------------------------------------------------------------------#
 # Core metadata + mandatory requirements
 # -----------------------------------------------------------------------------#
-packages_opt = [
-    # heavy numerical / plotting
-    "numpy", "scipy", "scikit-learn", "joblib", "numba", "imageio", "seaborn",
-     "h5io", "pingouin", "mat73", "numpyencoder", "networkx", "pandas", "statsmodels",
-    # file-format helpers
-    "pyexcel", "pyexcel-ods", "pyexcel-ods3", "python-pptx",
-    # EEG / M/EEG stack
-    "mne", "python-picard", "autoreject", "sleep_utils", "lspopt", "pybids",
-    "alog", "absl-py",
-    # misc singletons
-    "pyedflib",
-    "pytablewriter",
-    "pybind11",
-    "bleak",
-    "coverage",
-    "natsort",
-    "prettytable",
-    "pysnooper",
-    "clipboard",
-    "dateparser",
-    "opencv-python",
-    "pygame",
-    "dominate",
-    "pyglet",
-    "beautifulsoup4",
-    "wmi",
-    "compress-pickle",
-    "lz4",
-    "monitorcontrol",
-    "requests>=2.27.0",
-]
+packages_full = ['absl-py',
+                 'alog',
+                 'autoreject',
+                 'beautifulsoup4',
+                 'bleak',
+                 'clipboard',
+                 'certstore',
+                 'coverage',
+                 'dateparser',
+                 'dominate',
+                 'h5io',
+                 'imageio',
+                 'joblib',
+                 'lspopt',
+                 'lz4',
+                 'mat73',
+                 'mne',
+                 'mne-bids-pipeline',
+                 'monitorcontrol',
+                 'natsort',
+                 'networkx',
+                 'numba',
+                 'numpy',
+                 'numpyencoder',
+                 'opencv-python',
+                 'pandas',
+                 'pingouin',
+                 'pip-system-certs',
+                 'prettytable',
+                 'pybids',
+                 'pybind11',
+                 'pyedflib',
+                 'pyexcel',
+                 'pyexcel-ods',
+                 'pyexcel-ods3',
+                 'pygame',
+                 'pyglet',
+                 'pymupdf',
+                 'pytablewriter',
+                 'python-picard',
+                 'python-pptx',
+                 'requests',
+                 'scikit-learn',
+                 'scipy',
+                 'seaborn',
+                 'sleep_utils',
+                 'standard-imghdr',
+                 'statsmodels',
+                 'spyder-kernels',
+                 'telegram-send',
+                 'truststore',
+                 'tqdm',
+                 'wmi']
+
 if sys.platform.startswith("linux"):
-    packages_opt += ["jax"]
+    packages_full += ["jax"]
 
 setup(
     name="skjerns-utils",
-    version="1.19",
+    version="1.20",
     description="A collection of tools and boiler-plate functions",
     url="http://github.com/skjerns/skjerns-utils",
     author="skjerns",
     author_email="nomail",
     license="GNU 2.0",
-    install_requires=["tqdm", "natsort", "python-telegram-bot==13.5", "telegram-send==0.34", "requests>=2.27.0"],
+    install_requires=["tqdm", "natsort", "telegram-send"],
+    extras_require={"full": packages_full},
     packages=["stimer", "ospath", "cpu_usage", "telegram_send_exception"],
     zip_safe=False,
 )
 
-# -----------------------------------------------------------------------------#
-# Helper for installing optional packages
-# -----------------------------------------------------------------------------#
-def _pip_install(pkg, err_tail: int = 20) -> bool:
-    """
-    Install one or more packages with pip and stream output line-by-line.
 
-    Parameters
-    ----------
-    pkg : str | Sequence[str]
-        Package name or an iterable of package names.
-    err_tail : int, default 20
-        Number of trailing output lines to repeat if the installation fails.
-
-    Returns
-    -------
-    bool
-        True if ``pip`` exited with return-code 0, otherwise False.
-
-    Notes
-    -----
-    * ``stderr`` is merged into ``stdout`` to ensure error messages are visible
-      in real-time.
-    * If the command fails, the last *err_tail* lines are replayed so that the
-      user can immediately see the relevant error context above the ☓ banner.
-    """
-    cmd: list[str] = (
-        [sys.executable, "-m", "pip", "install", *pkg]
-        if isinstance(pkg, (list, tuple, set))
-        else [sys.executable, "-m", "pip", "install", str(pkg)]
-    )
-
-    # Ring buffer to keep the most recent lines for later replay if needed
-    recent: deque[str] = deque(maxlen=err_tail)
-
-    with subprocess.Popen(
-        cmd,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,      # merge stderr → stdout
-        text=True,                     # decode bytes automatically
-        bufsize=1,                     # line-buffered
-    ) as proc:
-        for line in proc.stdout:       # iterate line-by-line
-            print(line, end="", flush=True)
-            recent.append(line)
-
-    if proc.returncode != 0:
-        banner = f"\n✗ Could not install {pkg!r} (exit code {proc.returncode})"
-        print(banner, flush=True)
-        if recent:
-            print("─────────── last pip messages ───────────", flush=True)
-            for line in recent:
-                print(line, end="", flush=True)
-
-        return False
-
-    return True
 
 # -----------------------------------------------------------------------------#
 # Redirect stdout/stderr to Tk.Text widget
@@ -165,14 +133,13 @@ class Redirector:
 # -----------------------------------------------------------------------------#
 
 class InstallPackagesGUI:
-    """Optional configuration dialog for skjerns-utils (final layout)."""
+    """Optional configuration dialog for skjerns-utils."""
 
-    def __init__(self, optional_packages):
+    def __init__(self):
         import tkinter as tk
         from tkinter import ttk, Text
 
         # ───────── configuration ────────────────────────────────────────────
-        self.pkgs     = optional_packages
         self.timeout  = 15           # auto-close in s
         self.counting = True         # stop when a cb is toggled
 
@@ -190,7 +157,6 @@ class InstallPackagesGUI:
         # --- check-boxes (all start unchecked) -----------------------------
         self.var_spyder   = tk.BooleanVar(master=self.root, value=False)
         self.var_startup  = tk.BooleanVar(master=self.root, value=False)
-        self.var_deps     = tk.BooleanVar(master=self.root, value=False)
 
         self.chk_spyder  = tk.Checkbutton(
             top, text="install spyder.ini",
@@ -202,15 +168,9 @@ class InstallPackagesGUI:
             variable=self.var_startup, command=self._on_select,
             bg="black", fg="white", anchor="w", selectcolor="black",
         )
-        self.chk_deps    = tk.Checkbutton(
-            top, text="install additional packages",
-            variable=self.var_deps, command=self._on_select,
-            bg="black", fg="white", anchor="w", selectcolor="black",
-        )
 
         self.chk_spyder.pack(fill="x", anchor="w")
         self.chk_startup.pack(fill="x", anchor="w")
-        self.chk_deps.pack(fill="x", anchor="w")
 
         # --- action button --------------------------------------------------
         self.btn_action = tk.Button(
@@ -221,18 +181,12 @@ class InstallPackagesGUI:
 
         # ───────── console (middle) ─────────────────────────────────────────
         self.text_box = Text(
-            self.root, wrap="word", height=18, width=110,
+            self.root, wrap="word", height=10, width=110,
             bg="black", fg="white", font=("Consolas", 10)
         )
-        self.text_box.grid(row=1, column=0, padx=6, sticky="nsew")
+        self.text_box.grid(row=1, column=0, padx=6, pady=(0,6), sticky="nsew")
         self.redirect = Redirector(self.text_box, self.root)
 
-        # ───────── progress bar (bottom) ────────────────────────────────────
-        self.progress = ttk.Progressbar(
-            self.root, orient="horizontal", mode="determinate",
-            maximum=len(self.pkgs), length=500
-        )
-        self.progress.grid(row=2, column=0, padx=6, pady=(4,6), sticky="ew")
 
         # optional explanatory blurb
         print(
@@ -279,7 +233,6 @@ class InstallPackagesGUI:
         # disable further changes
         self.chk_spyder.config(state="disabled")
         self.chk_startup.config(state="disabled")
-        self.chk_deps.config(state="disabled")
         self.btn_action.config(state="disabled")
 
         # perform selected tasks
@@ -287,8 +240,6 @@ class InstallPackagesGUI:
             self._copy_spyder()
         if self.var_startup.get():
             self._copy_startup()
-        if self.var_deps.get():
-            self._install_pkgs()
 
         # ➌ finished: convert button to a *true* close-button
         self._actions_done = True               # flag: tasks already executed
@@ -336,23 +287,6 @@ class InstallPackagesGUI:
         shutil.copy("spyder.ini", dst)
         print(f"✓ Copied spyder.ini → {dst}\n")
 
-    def _install_pkgs(self):
-        if not self.pkgs:
-            return
-        print("Starting installation of optional dependencies …\n")
-        all_pks = []
-        for pkg in self.pkgs:
-            all_pks += [pkg] if isinstance(pkg, str) else pkg
-
-        for idx, pkg in enumerate(self.pkgs, start=1):
-            self.progress["value"] = idx
-            if not _pip_install(pkg):
-                
-                print('install manually by running:\npip install {all_pks}')
-
-                break
-        print("\n✓ All requested packages processed.\n")
-
     # ---------------------------------------------------------------- shutdown
     def _destroy(self):
         self.redirect.restore()
@@ -366,7 +300,7 @@ if __name__ == "__main__":
     # Running via `pip install -e .` passes arguments; skip GUI when building metadata
     if len(sys.argv) == 1 or sys.argv[1] != "egg_info":
         try:
-            InstallPackagesGUI(packages_opt)
-        except Exception as exc:  # headless build / missing Tk etc.
+            InstallPackagesGUI()
+        except Exception as exc:  # headless build / missing Tk etc:
             print(f"GUI creation failed – continuing without optional setup. ({exc})")
             print(traceback.format_exc())
