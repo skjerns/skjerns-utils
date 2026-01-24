@@ -19,6 +19,7 @@ try:
     from tqdm import tqdm
     import matplotlib as mlp
     import seaborn as sns
+    np.set_printoptions(legacy="1.25")
 except Exception as e:
     print(f'[startup_imports] Error while loading module: {e}')
 
@@ -225,3 +226,4 @@ warnings.formatwarning = warning_on_one_line
 
 # turn off numpy scientific printing notation
 np.set_printoptions(suppress=True, precision=8)
+
