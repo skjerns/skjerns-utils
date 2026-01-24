@@ -19,7 +19,6 @@ try:
     from tqdm import tqdm
     import matplotlib as mlp
     import seaborn as sns
-    np.set_printoptions(legacy="1.25")
 except Exception as e:
     print(f'[startup_imports] Error while loading module: {e}')
 
@@ -227,3 +226,10 @@ warnings.formatwarning = warning_on_one_line
 # turn off numpy scientific printing notation
 np.set_printoptions(suppress=True, precision=8)
 
+#%% legacy printing for scalars (e.g. no np.int(4) as repr)
+def numpy_scalar_displayhook(value):
+    if isinstance(value, (np.generic)):
+        print(str(value))
+    else:
+        sys.__displayhook__(value)
+sys.displayhook = numpy_scalar_displayhook
