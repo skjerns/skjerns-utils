@@ -18,8 +18,9 @@ mne
 mne-bids-pipeline
 monitorcontrol
 natsort
-networkx
 nc_py_api
+networkx
+nio
 numba
 numpy
 numpyencoder
@@ -42,8 +43,10 @@ pytablewriter
 python-picard
 python-pptx
 requests
+rocketchat-api
 scikit-learn
 scipy
+screeninfo
 seaborn
 sleep_utils
 standard-imghdr
