@@ -11,6 +11,7 @@ import builtins
 import warnings
 import subprocess
 import unittest
+import builtins
 
 try:
     import stimer
@@ -225,3 +226,28 @@ warnings.formatwarning = warning_on_one_line
 
 # turn off numpy scientific printing notation
 np.set_printoptions(suppress=True, precision=8)
+
+#%% legacy printing for scalars (e.g. no np.int(4) as repr)
+# All numpy scalar types that should print cleanly
+_scalar_types = (
+    # Floating point
+    np.float16, np.float32, np.float64,
+    # Integer signed
+    np.int8, np.int16, np.int32, np.int64,
+    # Integer unsigned
+    np.uint8, np.uint16, np.uint32, np.uint64,
+    # Complex
+    np.complex64, np.complex128,
+    # Boolean
+    np.bool_,
+)
+
+___builtin_repr = builtins.repr
+
+def _patched_repr(obj):
+    """Return clean repr for numpy scalars, unchanged for everything else."""
+    if isinstance(obj, _scalar_types):
+        return ___builtin_repr(obj.item())
+    return ___builtin_repr(obj)
+
+builtins.repr = _patched_repr

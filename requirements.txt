@@ -19,6 +19,7 @@ mne-bids-pipeline
 monitorcontrol
 natsort
 networkx
+nc_py_api
 numba
 numpy
 numpyencoder
@@ -36,6 +37,7 @@ pyexcel-ods3
 pygame
 pyglet
 pymupdf
+pyside6
 pytablewriter
 python-picard
 python-pptx
