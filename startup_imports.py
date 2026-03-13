@@ -14,12 +14,14 @@ import unittest
 import builtins
 
 try:
-    import stimer
-    from stimer import ContextProfiler
+  
     import numpy as np
     from tqdm import tqdm
     import matplotlib as mlp
     import seaborn as sns
+    import contextprofiler
+    import stimer
+    from stimer import ContextProfiler
 except Exception as e:
     print(f'[startup_imports] Error while loading module: {e}')
 

@@ -107,12 +107,16 @@ class InstallPackagesGUI:
         self.btn_startup = tk.Button(
             top, text="Copy startup_imports.py", command=self._copy_startup
         )
+        self.btn_claude = tk.Button(
+            top, text="Copy Claude defaults", command=self._copy_claude_defaults
+        )
         self.lbl_timeout = tk.Label(
             top, text=f"Closes in {self.timeout}s", bg="black", fg="white"
         )
 
         self.btn_spyder.pack(side="left", padx=5)
         self.btn_startup.pack(side="left", padx=5)
+        self.btn_claude.pack(side="left", padx=5)
         self.lbl_timeout.pack(side="right", padx=5)
 
 
@@ -177,6 +181,25 @@ class InstallPackagesGUI:
             self.btn_spyder.config(state="disabled")
         except Exception as e:
             print(f"✗ Error copying spyder.ini: {e}\n")
+
+    def _copy_claude_defaults(self):
+        try:
+            claude_dir = Path.home() / ".claude"
+            claude_dir.mkdir(parents=True, exist_ok=True)
+
+            # Copy settings.json
+            settings_dst = claude_dir / "settings.json"
+            shutil.copy("claude-settings.json", settings_dst)
+            print(f"✓ Copied claude-settings.json → {settings_dst}\n")
+
+            # Copy CLAUDE-default.md as CLAUDE.md
+            claude_md_dst = claude_dir / "CLAUDE.md"
+            shutil.copy("CLAUDE-default.md", claude_md_dst)
+            print(f"✓ Copied CLAUDE-default.md → {claude_md_dst}\n")
+
+            self.btn_claude.config(state="disabled")
+        except Exception as e:
+            print(f"✗ Error copying Claude defaults: {e}\n")
 
     # ---------------------------------------------------------------- shutdown
     def _destroy(self):
