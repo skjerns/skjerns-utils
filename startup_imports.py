@@ -1,5 +1,4 @@
 # system level imports, should never fail
-
 import os
 import sys
 import io
@@ -13,17 +12,24 @@ import subprocess
 import unittest
 import builtins
 
-try:
-  
-    import numpy as np
-    from tqdm import tqdm
-    import matplotlib as mlp
-    import seaborn as sns
-    import contextprofiler
-    import stimer
-    from stimer import ContextProfiler
-except Exception as e:
-    print(f'[startup_imports] Error while loading module: {e}')
+
+# some imports that might or might not be available
+__imports_startup = """
+import numpy as np
+from tqdm import tqdm
+import matplotlib as mlp
+import seaborn as sns
+import contextprofiler
+import stimer
+from stimer import ContextProfiler""".split('\n')
+
+
+for __import_statement in __imports_startup:
+    try:
+        exec(__import_statement)
+    except Exception as e:
+        print(f'[startup_imports] {type(e).__name__} while loading module: {e}: "{__import_statement}"')
+
 
 # Dummy clause. Just for correct linting in file.
 if []==():
